@@ -1,0 +1,31 @@
+---
+import PostCard from './PostCard.astro';
+
+interface Post {
+  title: string;
+  date: Date;
+  annotation: string;
+  type: 'essay' | 'curated';
+  url: string;
+}
+
+interface Props {
+  posts: Post[];
+  showAnnotation: boolean;
+}
+
+const { posts, showAnnotation } = Astro.props;
+---
+
+<div>
+  {posts.map((post) => (
+    <PostCard
+      title={post.title}
+      date={post.date}
+      annotation={post.annotation}
+      type={post.type}
+      url={post.url}
+      showAnnotation={showAnnotation}
+    />
+  ))}
+</div>

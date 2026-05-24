@@ -1,0 +1,24 @@
+---
+import BaseLayout from './BaseLayout.astro';
+import { siteConfig } from '../site.config';
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const {
+  title = siteConfig.authorFullName,
+  description = `Get in touch with ${siteConfig.authorFullName}.`,
+} = Astro.props;
+
+const canonicalUrl = Astro.url.href;
+---
+
+<BaseLayout title={title} description={description} canonicalUrl={canonicalUrl}>
+  <div class="max-w-3xl mx-auto px-4 py-16">
+    <div class="prose prose-gray max-w-none">
+      <slot />
+    </div>
+  </div>
+</BaseLayout>

@@ -1,0 +1,32 @@
+---
+import { getCollection } from 'astro:content';
+import ArticleLayout from '../../layouts/ArticleLayout.astro';
+
+export async function getStaticPaths() {
+  const essays = await getCollection('writing', ({ data }) => data.type === 'essay');
+  return essays.map((entry) => ({
+    params: { slug: entry.slug },
+    props: { entry },
+  }));
+}
+
+const { entry } = Astro.props;
+const { Content } = await entry.render();
+const { data } = entry;
+---
+
+<ArticleLayout
+  title={data.title}
+  description={data.description}
+  date={data.date}
+  video_desktop={data.video_desktop}
+  video_mobile={data.video_mobile}
+  poster_desktop={data.poster_desktop}
+  poster_mobile={data.poster_mobile}
+  focus_desktop={data.focus_desktop}
+  focus_mobile={data.focus_mobile}
+  title_appears_at={data.title_appears_at}
+  freeze_at={data.freeze_at}
+>
+  <Content />
+</ArticleLayout>

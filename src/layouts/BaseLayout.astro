@@ -1,0 +1,128 @@
+---
+import { siteConfig } from '../site.config';
+
+interface Props {
+  title: string;
+  description: string;
+  ogImage?: string;
+  canonicalUrl?: string;
+  isArticle?: boolean;
+}
+
+const {
+  title,
+  description,
+  ogImage = siteConfig.ogImageDefault,
+  canonicalUrl = Astro.url.href,
+  isArticle = false,
+} = Astro.props;
+
+const pageTitle = `${title} — ${siteConfig.authorFullName}`;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{pageTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonicalUrl} />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content={isArticle ? 'article' : 'website'} />
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:url" content={canonicalUrl} />
+
+    <!-- Twitter card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={pageTitle} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage} />
+
+    <!-- RSS -->
+    <link rel="alternate" type="application/rss+xml" title={`${siteConfig.authorFullName} — Writing`} href="/rss.xml" />
+
+    <!-- CookieYes — loads before GTM, sets consent defaults -->
+    <script
+      id="cookieyes"
+      type="text/javascript"
+      src={`https://cdn-cookieyes.com/client_data/${siteConfig.cookieYesScriptId}/script.js`}
+    ></script>
+
+    <!-- Consent defaults and conditional GTM injection -->
+    <script define:vars={{ gtmContainerId: siteConfig.gtmContainerId }}>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() { dataLayer.push(arguments); }
+      gtag('consent', 'default', {
+        analytics_storage: 'denied',
+        ad_storage: 'denied',
+        wait_for_update: 500,
+      });
+
+      document.addEventListener('cookieyes-consent-update', function (event) {
+        const detail = event.detail || {};
+        if (detail.analytics === 'yes') {
+          gtag('consent', 'update', { analytics_storage: 'granted' });
+
+          if (!document.getElementById('gtm-script')) {
+            const s = document.createElement('script');
+            s.id = 'gtm-script';
+            s.async = true;
+            s.src = `https://www.googletagmanager.com/gtm.js?id=${gtmContainerId}`;
+            document.head.appendChild(s);
+
+            dataLayer.push({ 'gtm.start': new Date().getTime(), event: 'gtm.js' });
+          }
+        }
+      });
+    </script>
+
+    <slot name="head" />
+  </head>
+  <body class="bg-white text-gray-900 font-sans antialiased">
+    <!-- GTM noscript fallback — only meaningful after consent, kept here for spec compliance -->
+    <noscript>
+      <iframe
+        src={`https://www.googletagmanager.com/ns.html?id=${siteConfig.gtmContainerId}`}
+        height="0"
+        width="0"
+        style="display:none;visibility:hidden"
+      ></iframe>
+    </noscript>
+
+    <main>
+      <slot />
+    </main>
+
+    <footer class="border-t border-gray-100">
+      <div class="max-w-3xl mx-auto px-4 py-8 text-sm text-gray-400 flex items-center justify-between">
+        <span>&copy; {new Date().getFullYear()} {siteConfig.authorFullName}</span>
+        <a
+          href={siteConfig.linkedInUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="hover:text-gray-600 transition-colors"
+        >LinkedIn</a>
+      </div>
+    </footer>
+
+    <!-- External link + work blog click tracking -->
+    <script define:vars={{ workBlogUrl: siteConfig.workBlogUrl }}>
+      document.addEventListener('click', function (e) {
+        const a = e.target.closest('a');
+        if (!a) return;
+        const href = a.getAttribute('href') || '';
+        if (!href.startsWith('http') || href.startsWith(window.location.origin)) return;
+        const isWorkBlog = href.startsWith(workBlogUrl);
+        window.dataLayer = window.dataLayer || [];
+        window.dataLayer.push({
+          event: isWorkBlog ? 'work_blog_click' : 'external_link_click',
+          destination: href,
+        });
+      });
+    </script>
+  </body>
+</html>

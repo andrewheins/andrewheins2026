@@ -1,0 +1,11 @@
+name = "andrewheins-contact-form"
+main = "workers/contact-form.js"
+compatibility_date = "2024-09-01"
+
+[vars]
+# SITE_BASE_URL used for CORS — set production value in Cloudflare dashboard
+SITE_BASE_URL = "https://andrewheins.ca"
+# Set these in Cloudflare dashboard under Worker settings, not here:
+# RESEND_API_KEY
+# GOOGLE_SHEET_ID
+# GOOGLE_SERVICE_ACCOUNT_JSON

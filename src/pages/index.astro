@@ -1,0 +1,82 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import VideoEntrance from '../components/sections/VideoEntrance.astro';
+import IntroBlock from '../components/sections/IntroBlock.astro';
+import PillarCards from '../components/sections/PillarCards.astro';
+import WorkBlock from '../components/sections/WorkBlock.astro';
+import ContactSection from '../components/sections/ContactSection.astro';
+import ContactForm from '../components/sections/ContactForm.astro';
+import { siteConfig } from '../site.config';
+
+const pillars = [
+  {
+    title: 'Promises',
+    body: "Business runs on promises. The job is to help organizations make them clearly and keep them reliably — not to extract value from the relationship over time. That's it. Everything else is downstream of that.",
+  },
+  {
+    title: 'Technology in Service of Outcomes',
+    body: "Technology moves fast. The outcomes your business needs don't. Figure out what you're actually trying to achieve first, then find the tools that serve it. Not the other way around.",
+  },
+  {
+    title: 'People First',
+    body: "People are the point. Technology is a tool. The move toward automating people out of the equation doesn't serve organizations, individuals, or society — even when it looks efficient on paper. I'm still working out what this means in practice. That's part of what I write about.",
+  },
+];
+
+const personSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  name: siteConfig.authorFullName,
+  url: siteConfig.siteBaseUrl,
+  image: siteConfig.headshotUrl,
+  jobTitle: 'President',
+  worksFor: {
+    '@type': 'Organization',
+    name: siteConfig.employerName,
+    url: siteConfig.employerUrl,
+  },
+  sameAs: [siteConfig.linkedInUrl, siteConfig.workBlogAuthorProfileUrl],
+};
+---
+
+<BaseLayout
+  title={siteConfig.authorFullName}
+  description={`${siteConfig.authorFullName} is President of ${siteConfig.employerName}. Writing about strategy, technology, and what organizations owe the people they build for.`}
+  canonicalUrl={Astro.url.href}
+>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(personSchema)} />
+  </Fragment>
+
+  <VideoEntrance
+    title="Helping organizations communicate clearly in a world that moves fast."
+    subtitle={`I'm ${siteConfig.authorFullName}. I'm President of ${siteConfig.employerName}, a digital agency. I write about strategy, technology, and the organizations trying to do something meaningful with both.`}
+  />
+
+  <div class="mt-[100vh]">
+    <IntroBlock body="I've spent the better part of fifteen years helping organizations figure out what they're actually trying to say — and then build the digital infrastructure to say it reliably. I'm President of Cantilever, a digital agency that works with companies serious about their digital presence. I write here about strategy, technology, and the harder questions underneath both: what we're building, who it's for, and whether the tools we're using are actually serving the outcomes we care about." />
+
+    {/* Writing section — hidden until writing section launches */}
+    {/* <PostList posts={[]} showAnnotation={true} /> */}
+
+    <PillarCards
+      intro="A few principles have shaped how I think about this work. They're not a framework I invented — they're patterns I kept running into until I started taking them seriously."
+      pillars={pillars}
+    />
+
+    <WorkBlock
+      body={`I'm President of ${siteConfig.employerName}, a digital agency that builds and grows digital presences for organizations serious about their online footprint. We do strategy, design, and development — and we're honest about which problems we can solve and which ones we can't.`}
+      ctaText={`${siteConfig.employerName} is the place to start →`}
+      ctaUrl={`${siteConfig.employerUrl}?utm_source=andrewheins.ca&utm_medium=personal_site&utm_campaign=work_section`}
+    />
+
+    <ContactSection
+      heading="Get in touch"
+      intro={`I'm reachable by email and on LinkedIn. If you have a question about digital strategy, want to discuss something I've written, or are interested in working with ${siteConfig.employerName}, I'd like to hear from it.`}
+      email={siteConfig.contactEmail}
+      linkedInUrl={siteConfig.linkedInUrl}
+    >
+      <ContactForm workerEndpoint={siteConfig.workerEndpoint} />
+    </ContactSection>
+  </div>
+</BaseLayout>

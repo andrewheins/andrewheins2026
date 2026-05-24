@@ -1,0 +1,21 @@
+---
+interface Props {
+  body: string;
+  ctaText: string;
+  ctaUrl: string;
+}
+
+const { body, ctaText, ctaUrl } = Astro.props;
+---
+
+<section class="max-w-3xl mx-auto px-6 py-16 border-t border-gray-100">
+  <p class="text-gray-700 leading-relaxed mb-5">{body}</p>
+  <a
+    href={ctaUrl}
+    target="_blank"
+    rel="noopener noreferrer"
+    class="text-gray-900 font-medium hover:underline"
+  >
+    {ctaText}
+  </a>
+</section>

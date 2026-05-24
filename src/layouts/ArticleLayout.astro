@@ -1,0 +1,115 @@
+---
+import BaseLayout from './BaseLayout.astro';
+import VideoEntrance from '../components/sections/VideoEntrance.astro';
+import AuthorBlock from '../components/sections/AuthorBlock.astro';
+import { siteConfig } from '../site.config';
+
+interface Props {
+  title: string;
+  description: string;
+  date: Date;
+  video_desktop?: string;
+  video_mobile?: string;
+  poster_desktop?: string;
+  poster_mobile?: string;
+  focus_desktop?: string;
+  focus_mobile?: string;
+  title_appears_at?: number;
+  freeze_at?: number;
+}
+
+const {
+  title,
+  description,
+  date,
+  video_desktop,
+  video_mobile,
+  poster_desktop,
+  poster_mobile,
+  focus_desktop,
+  focus_mobile,
+  title_appears_at,
+  freeze_at,
+} = Astro.props;
+
+const hasVideo = !!(video_desktop || video_mobile);
+const canonicalUrl = Astro.url.href;
+const ogImage = poster_desktop || siteConfig.ogImageDefault;
+
+const authorSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  name: siteConfig.authorFullName,
+  url: siteConfig.siteBaseUrl,
+  image: siteConfig.headshotUrl,
+};
+---
+
+<BaseLayout
+  title={title}
+  description={description}
+  ogImage={ogImage}
+  canonicalUrl={canonicalUrl}
+  isArticle={true}
+>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(authorSchema)} />
+  </Fragment>
+
+  {hasVideo && (
+    <VideoEntrance
+      video_desktop={video_desktop}
+      video_mobile={video_mobile}
+      poster_desktop={poster_desktop}
+      poster_mobile={poster_mobile}
+      focus_desktop={focus_desktop}
+      focus_mobile={focus_mobile}
+      title_appears_at={title_appears_at}
+      freeze_at={freeze_at}
+      title={title}
+      subtitle={siteConfig.authorFullName}
+    />
+  )}
+
+  <div class:list={['max-w-3xl mx-auto px-4', { 'mt-[100vh]': hasVideo }]}>
+    <article class="py-16 prose prose-gray max-w-none">
+      <slot />
+    </article>
+
+    <AuthorBlock
+      name={siteConfig.authorFullName}
+      headshotUrl={siteConfig.headshotUrl}
+      headline={siteConfig.professionalHeadline}
+      employerName={siteConfig.employerName}
+      employerUrl={siteConfig.employerUrl}
+    />
+  </div>
+
+  <!-- Scroll depth tracking for articles -->
+  <script>
+    const article = document.querySelector('article');
+    if (article) {
+      const thresholds = [0.25, 0.5, 0.75, 1.0];
+      const fired = new Set<number>();
+
+      window.addEventListener('scroll', function () {
+        const scrollY = window.scrollY;
+        const articleRect = article.getBoundingClientRect();
+        const articleTop = scrollY + articleRect.top;
+        const articleHeight = article.offsetHeight;
+        const progress = (scrollY + window.innerHeight - articleTop) / articleHeight;
+
+        thresholds.forEach(function (t) {
+          if (progress >= t && !fired.has(t)) {
+            fired.add(t);
+            window.dataLayer = window.dataLayer || [];
+            window.dataLayer.push({
+              event: 'article_scroll_depth',
+              depth: Math.round(t * 100),
+            });
+          }
+        });
+      }, { passive: true });
+    }
+  </script>
+</BaseLayout>

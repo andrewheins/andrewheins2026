@@ -1,0 +1,61 @@
+---
+import BaseLayout from './BaseLayout.astro';
+import { siteConfig } from '../site.config';
+
+interface Props {
+  title?: string;
+  description?: string;
+  image?: string;
+  showEmployer?: boolean;
+}
+
+const {
+  title = `About ${siteConfig.authorFullName}`,
+  description = `${siteConfig.authorFullName}, ${siteConfig.employerName}.`,
+  image,
+  showEmployer = false,
+} = Astro.props;
+
+const headshotUrl = image
+  ? `${siteConfig.assetBaseUrl}/${image}`
+  : siteConfig.headshotUrl;
+
+const canonicalUrl = Astro.url.href;
+---
+
+<BaseLayout
+  title={title}
+  description={description}
+  ogImage={headshotUrl}
+  canonicalUrl={canonicalUrl}
+>
+  <div class="max-w-3xl mx-auto px-4 py-16">
+    <div class="flex flex-col sm:flex-row gap-8 items-start mb-12">
+      <img
+        src={headshotUrl}
+        alt={siteConfig.authorFullName}
+        class="w-32 h-32 rounded-full object-cover flex-shrink-0"
+      />
+      <div>
+        <h1 class="text-3xl font-bold mb-1">{siteConfig.authorFullName}</h1>
+        {showEmployer && (
+          <p class="text-gray-500">
+            President,{' '}
+            <a
+              href={siteConfig.employerUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="text-gray-700 hover:underline"
+            >
+              {siteConfig.employerName}
+            </a>
+          </p>
+        )}
+      </div>
+    </div>
+
+    <div class="prose prose-gray max-w-none">
+      <slot />
+    </div>
+  </div>
+</BaseLayout>

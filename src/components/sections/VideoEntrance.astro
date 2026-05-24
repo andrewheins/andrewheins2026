@@ -1,0 +1,169 @@
+---
+// Performance budget: desktop video ≤ 8MB, mobile video ≤ 4MB,
+// poster images ≤ 200KB each.
+
+interface Props {
+  video_desktop?: string;
+  video_mobile?: string;
+  poster_desktop?: string;
+  poster_mobile?: string;
+  focus_desktop?: string;
+  focus_mobile?: string;
+  title_appears_at?: number;
+  freeze_at?: number;
+  title: string;
+  subtitle: string;
+}
+
+const {
+  video_desktop,
+  video_mobile,
+  poster_desktop,
+  poster_mobile,
+  focus_desktop = '50% 50%',
+  focus_mobile = '50% 50%',
+  title_appears_at,
+  freeze_at,
+  title,
+  subtitle,
+} = Astro.props;
+
+const hasVideo = !!(video_desktop || video_mobile);
+const shouldLoop = freeze_at === undefined;
+---
+
+<div id="video-entrance" class="fixed inset-0 z-50 bg-black overflow-hidden">
+  <!-- Poster: pre-load fallback behind video; revealed on freeze -->
+  {poster_desktop && (
+    <img
+      id="video-poster"
+      src={poster_desktop}
+      alt=""
+      aria-hidden="true"
+      class="absolute inset-0 w-full h-full object-cover"
+      style={`object-position: ${focus_desktop}`}
+    />
+  )}
+
+  <video
+    id="entrance-video"
+    class="absolute inset-0 w-full h-full object-cover z-10"
+    autoplay
+    muted
+    playsinline
+    {...shouldLoop ? { loop: true } : {}}
+  >
+    {video_desktop && (
+      <source src={video_desktop} media="(min-width: 768px)" type="video/mp4" />
+    )}
+    {video_mobile && (
+      <source src={video_mobile} type="video/mp4" />
+    )}
+  </video>
+
+  <!-- Title overlay — fades in at title_appears_at, or immediately if no video -->
+  <div
+    id="video-overlay"
+    class="absolute inset-0 z-20 flex flex-col justify-end items-center text-center px-8 pb-14 opacity-0 transition-opacity duration-700"
+    style="background: linear-gradient(transparent 40%, rgba(0,0,0,0.65) 100%)"
+  >
+    <h1 class="text-white text-4xl md:text-6xl font-bold mb-4 max-w-2xl leading-tight">
+      {title}
+    </h1>
+    <p class="text-white/70 text-base max-w-xl leading-relaxed">{subtitle}</p>
+
+    <div class="mt-8 flex flex-col items-center gap-1 text-white/50">
+      <span class="text-xs uppercase tracking-widest">scroll to read</span>
+      <svg class="w-5 h-5 animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+      </svg>
+    </div>
+  </div>
+
+  <!-- Mute toggle — only rendered when a video source is present -->
+  {hasVideo && (
+    <button
+      id="mute-toggle"
+      type="button"
+      class="absolute top-4 right-4 z-30 bg-black/40 hover:bg-black/60 text-white rounded-full p-2 transition-colors"
+      aria-label="Unmute video"
+    >
+      <svg id="icon-muted" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2" />
+      </svg>
+      <svg id="icon-unmuted" class="w-5 h-5 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M15.536 8.464a5 5 0 010 7.072M12 6v12M8.464 9.172a5 5 0 000 5.656M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+      </svg>
+    </button>
+  )}
+</div>
+
+<script define:vars={{ focus_desktop, focus_mobile, title_appears_at, freeze_at, hasVideo }}>
+  const entrance = document.getElementById('video-entrance');
+  const video = /** @type {HTMLVideoElement|null} */ (document.getElementById('entrance-video'));
+  const poster = /** @type {HTMLImageElement|null} */ (document.getElementById('video-poster'));
+  const overlay = document.getElementById('video-overlay');
+  const muteBtn = document.getElementById('mute-toggle');
+  const iconMuted = document.getElementById('icon-muted');
+  const iconUnmuted = document.getElementById('icon-unmuted');
+
+  // Apply object-position based on viewport; re-apply on resize
+  function applyFocus() {
+    const pos = window.innerWidth >= 768 ? focus_desktop : focus_mobile;
+    if (video) video.style.objectPosition = pos;
+    if (poster) poster.style.objectPosition = pos;
+  }
+  applyFocus();
+  window.addEventListener('resize', applyFocus);
+
+  // Mute toggle
+  if (muteBtn && video) {
+    muteBtn.addEventListener('click', function () {
+      video.muted = !video.muted;
+      muteBtn.setAttribute('aria-label', video.muted ? 'Unmute video' : 'Mute video');
+      iconMuted.classList.toggle('hidden', !video.muted);
+      iconUnmuted.classList.toggle('hidden', video.muted);
+    });
+  }
+
+  // Title overlay visibility
+  let overlayShown = false;
+  if (!hasVideo || title_appears_at == null) {
+    // No video or no delay configured — show overlay immediately
+    if (overlay) overlay.style.opacity = '1';
+    overlayShown = true;
+  } else if (video && overlay) {
+    video.addEventListener('timeupdate', function () {
+      if (!overlayShown && video.currentTime >= title_appears_at) {
+        overlayShown = true;
+        overlay.style.opacity = '1';
+      }
+    });
+  }
+
+  // Freeze + crossfade to poster
+  let frozen = false;
+  if (video && freeze_at != null) {
+    video.addEventListener('timeupdate', function () {
+      if (!frozen && video.currentTime >= freeze_at) {
+        frozen = true;
+        video.pause();
+        if (poster) {
+          video.style.transition = 'opacity 300ms ease';
+          video.style.opacity = '0';
+        }
+      }
+    });
+  }
+
+  // Scroll fade — layer opacity over first 300px of scroll
+  function handleScroll() {
+    if (entrance) {
+      entrance.style.opacity = String(Math.max(0, 1 - window.scrollY / 300));
+    }
+  }
+  window.addEventListener('scroll', handleScroll, { passive: true });
+</script>

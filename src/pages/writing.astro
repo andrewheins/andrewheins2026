@@ -1,0 +1,31 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PostList from '../components/sections/PostList.astro';
+import { siteConfig } from '../site.config';
+
+const allPosts = await getCollection('writing');
+allPosts.sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+
+const posts = allPosts.map((entry) => ({
+  title: entry.data.title,
+  date: entry.data.date,
+  annotation: entry.data.annotation,
+  type: entry.data.type,
+  url:
+    entry.data.type === 'curated'
+      ? (entry.data.externalUrl ?? '#')
+      : `/writing/${entry.slug}/`,
+}));
+---
+
+<BaseLayout
+  title="Writing"
+  description={`Essays and curated reading by ${siteConfig.authorFullName}.`}
+  canonicalUrl={Astro.url.href}
+>
+  <div class="max-w-3xl mx-auto px-4 py-16">
+    <h1 class="text-3xl font-bold mb-10">Writing</h1>
+    <PostList posts={posts} showAnnotation={true} />
+  </div>
+</BaseLayout>

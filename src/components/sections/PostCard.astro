@@ -1,0 +1,47 @@
+---
+interface Props {
+  title: string;
+  date: Date;
+  annotation: string;
+  type: 'essay' | 'curated';
+  url: string;
+  showAnnotation: boolean;
+}
+
+const { title, date, annotation, type, url, showAnnotation } = Astro.props;
+
+const isExternal = type === 'curated';
+const formattedDate = date.toLocaleDateString('en-CA', {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric',
+});
+---
+
+<article class="py-6 border-b border-gray-100 last:border-0">
+  <div class="flex items-start justify-between gap-4">
+    <div class="flex-1">
+      <a
+        href={url}
+        {...isExternal ? { target: '_blank', rel: 'noopener noreferrer' } : {}}
+        class="group"
+      >
+        <h2 class="text-lg font-semibold text-gray-900 group-hover:text-gray-600 transition-colors leading-snug">
+          {title}
+          {isExternal && (
+            <span class="ml-1 text-gray-400 text-sm font-normal" aria-label="external link">↗</span>
+          )}
+        </h2>
+      </a>
+      {showAnnotation && (
+        <p class="mt-1 text-gray-500 text-sm leading-relaxed">{annotation}</p>
+      )}
+    </div>
+    <time
+      datetime={date.toISOString()}
+      class="text-sm text-gray-400 whitespace-nowrap mt-1 flex-shrink-0"
+    >
+      {formattedDate}
+    </time>
+  </div>
+</article>
