@@ -1,0 +1,60 @@
+---
+// Inlines an SVG at build time so its internal elements are part of the DOM.
+// Accepts either a remote URL (https://...) or a local path relative to the
+// project root (e.g. /src/content/svg/file.svg).
+
+import fs from 'node:fs';
+import path from 'node:path';
+
+interface Props {
+  src: string;
+  alt?: string;
+}
+
+const { src, alt = '' } = Astro.props;
+
+function processSvg(raw: string): string {
+  raw = raw.replace(/<\?xml[^>]*\?>/gi, '').replace(/<!DOCTYPE[^>]*>/gi, '').trim();
+  // Drop fixed width/height so the SVG scales responsively via CSS
+  raw = raw.replace(/(<svg[^>]*)\swidth="[^"]*"/i, '$1');
+  raw = raw.replace(/(<svg[^>]*)\sheight="[^"]*"/i, '$1');
+  return raw;
+}
+
+let svgContent = '';
+
+if (src.startsWith('http://') || src.startsWith('https://')) {
+  try {
+    const res = await fetch(src);
+    if (res.ok) {
+      svgContent = processSvg(await res.text());
+    } else {
+      console.warn(`[BLineSvg] fetch failed (${res.status}): ${src}`);
+    }
+  } catch (e) {
+    console.warn(`[BLineSvg] fetch error: ${src}`, e);
+  }
+} else {
+  try {
+    const filePath = path.join(process.cwd(), src);
+    const raw = fs.readFileSync(filePath, 'utf8');
+    svgContent = processSvg(raw);
+  } catch (e) {
+    console.warn(`[BLineSvg] file read error: ${src}`, e);
+  }
+}
+---
+
+{svgContent ? (
+  <div class="b-line-svg" role="img" aria-label={alt} set:html={svgContent} />
+) : (
+  <p class="b-line-svg-error">Diagram could not be loaded.</p>
+)}
+
+<style>
+  .b-line-svg :global(svg) {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+</style>

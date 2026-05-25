@@ -15,25 +15,25 @@ const { id, title } = Astro.props;
   aria-label={title}
   hidden
 >
-  <button
-    class="b-line-panel-back"
-    type="button"
-    aria-label="Close panel and return to article"
-    data-panel-close
-  >
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-      <polyline points="15 18 9 12 15 6"/>
-    </svg>
-    Back to article
-  </button>
-
-  <div class="b-line-panel-inner">
-    <div class="b-line-panel-header">
+  <header class="b-line-panel-header">
+    <button
+      class="b-line-panel-back"
+      type="button"
+      aria-label="Close panel and return to article"
+      data-panel-close
+    >
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <polyline points="15 18 9 12 15 6"/>
+      </svg>
+      Back to article
+    </button>
+    <div class="b-line-panel-title-bar">
       <span class="b-line-panel-title">{title}</span>
     </div>
-    <div class="b-line-panel-body">
-      <slot />
-    </div>
+  </header>
+
+  <div class="b-line-panel-body">
+    <slot />
   </div>
 </div>
 
@@ -42,43 +42,46 @@ const { id, title } = Astro.props;
     position: fixed;
     top: 0;
     right: 0;
-    width: min(560px, 92vw);
+    width: min(56rem, 92vw);
     height: 100dvh;
     background: #fff;
     border-left: 1px solid #e5e7eb;
     z-index: 50;
     transform: translateX(100%);
     transition: transform 0.4s cubic-bezier(0.32, 0.72, 0, 1);
-    overflow-y: auto;
-    overscroll-behavior: contain;
+    /* Flex column: header is fixed height, body scrolls */
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
   }
 
   .b-line-panel:not([hidden]) {
-    display: block !important;
+    display: flex !important;
   }
 
   .b-line-panel.is-open {
     transform: translateX(0);
   }
 
-  /* Sticky back button — always reachable as the panel scrolls */
+  /* === Header — always visible === */
+  .b-line-panel-header {
+    flex-shrink: 0;
+    border-bottom: 1px solid #e5e7eb;
+  }
+
   .b-line-panel-back {
-    position: sticky;
-    top: 0;
-    z-index: 1;
-    width: 100%;
     display: flex;
     align-items: center;
     gap: 0.4rem;
+    width: 100%;
     padding: 0.875rem 2rem;
     font-size: 0.8125rem;
     font-weight: 500;
     color: #4b5563;
     background: #fff;
-    border-bottom: 1px solid #f3f4f6;
     cursor: pointer;
-    transition: color 0.15s, background-color 0.15s;
     text-align: left;
+    transition: color 0.15s, background-color 0.15s;
   }
 
   .b-line-panel-back:hover {
@@ -86,42 +89,45 @@ const { id, title } = Astro.props;
     background-color: #f9fafb;
   }
 
-  .b-line-panel-inner {
-    padding: 1.75rem 2rem 2rem;
-    min-height: calc(100% - 3rem); /* account for back button height */
-    display: flex;
-    flex-direction: column;
-  }
-
-  .b-line-panel-header {
-    margin-bottom: 1.25rem;
-    padding-bottom: 1rem;
-    border-bottom: 1px solid #f3f4f6;
+  .b-line-panel-title-bar {
+    padding: 0.625rem 2rem 0.875rem;
+    border-top: 1px solid #f3f4f6;
   }
 
   .b-line-panel-title {
-    font-size: 0.875rem;
+    font-size: 0.8125rem;
     font-weight: 600;
     color: #374151;
     text-transform: uppercase;
-    letter-spacing: 0.05em;
+    letter-spacing: 0.06em;
   }
 
+  /* === Body — scrollable === */
   .b-line-panel-body {
     flex: 1;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: 1.75rem 2rem 2rem;
     font-size: 0.9rem;
     line-height: 1.7;
     color: #374151;
   }
 
-  .b-line-panel-body img {
+  .b-line-panel-body :global(img),
+  .b-line-panel-body :global(svg) {
     width: 100%;
     height: auto;
     display: block;
     border-radius: 4px;
   }
 
-  .b-line-panel-body p {
+  .b-line-panel-body :global(p) {
     margin-bottom: 1rem;
+  }
+
+  .b-line-panel-body :global(a) {
+    color: inherit;
+    text-decoration: underline;
+    text-underline-offset: 2px;
   }
 </style>

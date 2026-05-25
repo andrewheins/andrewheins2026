@@ -5,6 +5,7 @@ import BLineAside from '../../components/BLineAside.astro';
 import BLineImage from '../../components/BLineImage.astro';
 import BLinePanel from '../../components/BLinePanel.astro';
 import BLinePanelTrigger from '../../components/BLinePanelTrigger.astro';
+import BLineSvg from '../../components/BLineSvg.astro';
 
 export async function getStaticPaths() {
   const essays = await getCollection('writing', ({ data }) => data.type === 'essay');
@@ -18,12 +19,13 @@ const { entry } = Astro.props;
 const { Content } = await entry.render();
 const { data } = entry;
 
-const mdxComponents = { BLineAside, BLineImage, BLinePanel, BLinePanelTrigger };
+const mdxComponents = { BLineAside, BLineImage, BLinePanel, BLinePanelTrigger, BLineSvg };
 ---
 
 <ArticleLayout
   title={data.title}
   description={data.description}
+  annotation={data.annotation}
   date={data.date}
   video_desktop={data.video_desktop}
   video_mobile={data.video_mobile}

@@ -1,0 +1,40 @@
+<svg width="100%" viewBox="80 10 520 282" role="img" xmlns="http://www.w3.org/2000/svg">
+  <title>Layer 1 network audit architecture — devices to DNS logging to internet</title>
+  <desc>Data flow diagram showing outbound traffic from all household devices passing through a Pi-hole DNS logging layer before reaching the internet. DNS-over-HTTPS traffic bypasses this layer entirely.</desc>
+
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+  </defs>
+
+  <!-- DEVICES ROW -->
+  <rect x="100" y="30" width="148" height="44" rx="8" fill="#444441" stroke="#b4b2a9" stroke-width="1"/>
+  <text x="174" y="52" text-anchor="middle" dominant-baseline="central" fill="#d3d1c7" font-size="14" font-weight="500" font-family="system-ui,-apple-system,sans-serif">Mac</text>
+
+  <rect x="264" y="30" width="148" height="44" rx="8" fill="#444441" stroke="#b4b2a9" stroke-width="1"/>
+  <text x="338" y="52" text-anchor="middle" dominant-baseline="central" fill="#d3d1c7" font-size="14" font-weight="500" font-family="system-ui,-apple-system,sans-serif">iPhone</text>
+
+  <rect x="428" y="30" width="148" height="44" rx="8" fill="#444441" stroke="#b4b2a9" stroke-width="1"/>
+  <text x="502" y="52" text-anchor="middle" dominant-baseline="central" fill="#d3d1c7" font-size="14" font-weight="500" font-family="system-ui,-apple-system,sans-serif">Smart TV + 7</text>
+
+  <!-- Converge lines from devices to Layer 1 -->
+  <line x1="174" y1="74" x2="174" y2="100" stroke="#6b7280" stroke-width="1.5" fill="none"/>
+  <line x1="338" y1="74" x2="338" y2="100" stroke="#6b7280" stroke-width="1.5" fill="none"/>
+  <line x1="502" y1="74" x2="502" y2="100" stroke="#6b7280" stroke-width="1.5" fill="none"/>
+  <line x1="174" y1="100" x2="502" y2="100" stroke="#6b7280" stroke-width="1.5" fill="none"/>
+  <line x1="340" y1="100" x2="340" y2="118" stroke="#374151" stroke-width="2" fill="none" marker-end="url(#arrow)"/>
+
+  <!-- LAYER 1: DNS logging -->
+  <rect x="100" y="118" width="480" height="70" rx="8" fill="#085041" stroke="#5dcaa5" stroke-width="1"/>
+  <text x="340" y="142" text-anchor="middle" dominant-baseline="central" fill="#9fe1cb" font-size="14" font-weight="500" font-family="system-ui,-apple-system,sans-serif">Layer 1 — DNS logging</text>
+  <text x="340" y="162" text-anchor="middle" dominant-baseline="central" fill="#5dcaa5" font-size="12" font-family="system-ui,-apple-system,sans-serif">Pi-hole · every domain lookup, timestamped per device</text>
+
+  <!-- Arrow to Internet -->
+  <line x1="340" y1="188" x2="340" y2="218" stroke="#374151" stroke-width="2" fill="none" marker-end="url(#arrow)"/>
+
+  <!-- INTERNET -->
+  <rect x="230" y="218" width="220" height="44" rx="8" fill="#444441" stroke="#b4b2a9" stroke-width="1"/>
+  <text x="340" y="240" text-anchor="middle" dominant-baseline="central" fill="#d3d1c7" font-size="14" font-weight="500" font-family="system-ui,-apple-system,sans-serif">Internet</text>
+
+</svg>

@@ -105,7 +105,10 @@ const pageTitle = `${title} — ${siteConfig.authorFullName}`;
 
     <slot name="head" />
   </head>
-  <style>html { font-size: 18px; }</style>
+  <style>
+    html { font-size: 18px; }
+    :global(h2, h3, h4) { font-family: 'Rock Salt', cursive; }
+  </style>
   <body class="text-gray-900 font-sans antialiased overflow-x-hidden" style="background-color: #f8f5f0; background-image: radial-gradient(ellipse at 50% -5%, #e4ddd2 0%, #f8f5f0 60%);">
 
     <!-- GTM noscript fallback — only meaningful after consent, kept here for spec compliance -->
@@ -119,7 +122,7 @@ const pageTitle = `${title} — ${siteConfig.authorFullName}`;
     </noscript>
 
     <Nav />
-    <main style="padding-top: 3.5rem;">
+    <main>
       <slot />
     </main>
 

@@ -19,12 +19,14 @@
     margin: 2.5rem 0;
   }
 
+  /* Desktop default: image in normal flow sets the container height */
   .b-line-aside-bg {
     display: block;
     width: 100%;
     height: auto;
   }
 
+  /* Text floats on top of the image */
   .b-line-aside-inner {
     position: absolute;
     inset: 0;
@@ -45,5 +47,28 @@
 
   .b-line-aside-inner :global(p + p) {
     margin-top: 0.75rem;
+  }
+
+  /* Mobile: text drives the container height; image contained behind it */
+  @media (max-width: 639px) {
+    .b-line-aside {
+      overflow: hidden;
+    }
+
+    .b-line-aside-bg {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      object-position: center;
+    }
+
+    .b-line-aside-inner {
+      position: relative;
+      z-index: 1;
+      padding: 2rem 1.5rem;
+      font-size: 1rem;
+    }
   }
 </style>

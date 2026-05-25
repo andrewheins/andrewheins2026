@@ -1,7 +1,7 @@
 export const siteConfig = {
   authorFullName: 'Andrew Heins',
   professionalHeadline: 'President, Cantilever',
-  authorBio: "I've been on the internet since MUDs and Geocities, and I'm still trying to figure out what we built. I'm President of Cantilever, a digital agency. I still think we can deliver on the promise we saw in it as kids.",
+  authorBio: "I'm President of Cantilever, a digital agency. I've been on the internet since MUDs and Geocities, and I'm still trying to figure out what we built. I still think we can deliver on the promise we saw in it as kids.",
   employerName: 'Cantilever',
   employerUrl: 'https://cantilever.co',
   headshotUrl: 'https://assets.andrewheins.ca/images/andrew-photo.jpg',

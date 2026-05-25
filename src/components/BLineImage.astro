@@ -1,6 +1,4 @@
 ---
-import { Image } from 'astro:assets';
-
 interface Props {
   src: string;
   alt: string;
@@ -22,25 +20,17 @@ const { src, alt, caption, photo = false, scale } = Astro.props;
       <div class="tape tape-tr" aria-hidden="true"></div>
       <div class="tape tape-bl" aria-hidden="true"></div>
       <div class="tape tape-br" aria-hidden="true"></div>
-      <Image
+      <img
         src={src}
         alt={alt}
-        inferSize
-        widths={[400, 840, 1680]}
-        sizes="(min-width: 900px) min(840px, 55vw), calc(100vw - 2rem)"
-        format="webp"
         loading="lazy"
         class="w-full h-auto block"
       />
     </div>
   ) : (
-    <Image
+    <img
       src={src}
       alt={alt}
-      inferSize
-      widths={[400, 840, 1680]}
-      sizes="(min-width: 900px) min(840px, 55vw), calc(100vw - 2rem)"
-      format="webp"
       loading="lazy"
       class="w-full h-auto block b-line-img"
     />

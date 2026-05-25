@@ -1,0 +1,87 @@
+<svg width="100%" viewBox="80 10 520 660" role="img" xmlns="http://www.w3.org/2000/svg">
+  <title>Home network audit architecture — Mac traffic through Layers 3 and 4, other devices bypassing</title>
+  <desc>Data flow diagram showing all devices through shared DNS logging and deep packet inspection layers, then splitting. Mac traffic funnels through packet capture and TLS interception on the left. All other devices bypass those layers on the right. Both paths converge at the internet.</desc>
+
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+  </defs>
+
+  <!-- DEVICES ROW -->
+  <rect x="100" y="30" width="148" height="44" rx="8" fill="#444441" stroke="#b4b2a9" stroke-width="1"/>
+  <text x="174" y="52" text-anchor="middle" dominant-baseline="central" fill="#d3d1c7" font-size="14" font-weight="500" font-family="system-ui,-apple-system,sans-serif">Mac</text>
+
+  <rect x="264" y="30" width="148" height="44" rx="8" fill="#444441" stroke="#b4b2a9" stroke-width="1"/>
+  <text x="338" y="52" text-anchor="middle" dominant-baseline="central" fill="#d3d1c7" font-size="14" font-weight="500" font-family="system-ui,-apple-system,sans-serif">iPhone</text>
+
+  <rect x="428" y="30" width="148" height="44" rx="8" fill="#444441" stroke="#b4b2a9" stroke-width="1"/>
+  <text x="502" y="52" text-anchor="middle" dominant-baseline="central" fill="#d3d1c7" font-size="14" font-weight="500" font-family="system-ui,-apple-system,sans-serif">Smart TV + 7</text>
+
+  <!-- Converge lines from devices to Layer 1 -->
+  <line x1="174" y1="74" x2="174" y2="100" stroke="#6b7280" stroke-width="1.5" fill="none"/>
+  <line x1="338" y1="74" x2="338" y2="100" stroke="#6b7280" stroke-width="1.5" fill="none"/>
+  <line x1="502" y1="74" x2="502" y2="100" stroke="#6b7280" stroke-width="1.5" fill="none"/>
+  <line x1="174" y1="100" x2="502" y2="100" stroke="#6b7280" stroke-width="1.5" fill="none"/>
+  <line x1="340" y1="100" x2="340" y2="118" stroke="#374151" stroke-width="2" fill="none" marker-end="url(#arrow)"/>
+
+  <!-- LAYER 1: DNS — full width, all devices -->
+  <rect x="100" y="118" width="480" height="70" rx="8" fill="#085041" stroke="#5dcaa5" stroke-width="1"/>
+  <text x="340" y="142" text-anchor="middle" dominant-baseline="central" fill="#9fe1cb" font-size="14" font-weight="500" font-family="system-ui,-apple-system,sans-serif">Layer 1 — DNS logging</text>
+  <text x="340" y="162" text-anchor="middle" dominant-baseline="central" fill="#5dcaa5" font-size="12" font-family="system-ui,-apple-system,sans-serif">Pi-hole · every domain lookup, timestamped per device</text>
+
+  <line x1="340" y1="188" x2="340" y2="228" stroke="#374151" stroke-width="2" fill="none" marker-end="url(#arrow)"/>
+
+  <!-- LAYER 2: DPI — full width, all devices -->
+  <rect x="100" y="228" width="480" height="70" rx="8" fill="#085041" stroke="#5dcaa5" stroke-width="1"/>
+  <text x="340" y="252" text-anchor="middle" dominant-baseline="central" fill="#9fe1cb" font-size="14" font-weight="500" font-family="system-ui,-apple-system,sans-serif">Layer 2 — deep packet inspection</text>
+  <text x="340" y="272" text-anchor="middle" dominant-baseline="central" fill="#5dcaa5" font-size="12" font-family="system-ui,-apple-system,sans-serif">Ubiquiti router · app identity, volume, direction — all devices</text>
+
+  <!-- SPLIT from Layer 2 bottom -->
+  <line x1="340" y1="298" x2="340" y2="328" stroke="#6b7280" stroke-width="1.5" fill="none"/>
+  <line x1="200" y1="328" x2="470" y2="328" stroke="#6b7280" stroke-width="1.5" fill="none"/>
+  <!-- Lane labels -->
+  <text x="210" y="339" text-anchor="middle" dominant-baseline="central" fill="#6b7280" font-size="11" font-family="system-ui,-apple-system,sans-serif">Mac</text>
+  <text x="470" y="339" text-anchor="middle" dominant-baseline="central" fill="#9ca3af" font-size="11" font-family="system-ui,-apple-system,sans-serif">Other devices</text>
+  <!-- Left solid arrow → Mac lane -->
+  <line x1="200" y1="328" x2="200" y2="348" stroke="#374151" stroke-width="2" fill="none" marker-end="url(#arrow)"/>
+  <!-- Right dashed arrow → bypass lane -->
+  <line x1="470" y1="328" x2="470" y2="348" stroke="#9ca3af" stroke-width="1.5" stroke-dasharray="4 3" fill="none" marker-end="url(#arrow)"/>
+
+  <!-- LAYER 3: Packet capture — Mac only -->
+  <rect x="100" y="348" width="220" height="70" rx="8" fill="#085041" stroke="#5dcaa5" stroke-width="1"/>
+  <text x="210" y="372" text-anchor="middle" dominant-baseline="central" fill="#9fe1cb" font-size="14" font-weight="500" font-family="system-ui,-apple-system,sans-serif">Layer 3 — packet capture</text>
+  <text x="210" y="392" text-anchor="middle" dominant-baseline="central" fill="#5dcaa5" font-size="12" font-family="system-ui,-apple-system,sans-serif">tcpdump → Pi → pcap files</text>
+
+  <!-- Bypass L3: other devices -->
+  <rect x="360" y="348" width="220" height="70" rx="8" fill="none" stroke="#9ca3af" stroke-width="1.5" stroke-dasharray="4 3"/>
+  <text x="470" y="372" text-anchor="middle" dominant-baseline="central" fill="#6b7280" font-size="13" font-weight="500" font-family="system-ui,-apple-system,sans-serif">No packet capture</text>
+  <text x="470" y="392" text-anchor="middle" dominant-baseline="central" fill="#9ca3af" font-size="12" font-family="system-ui,-apple-system,sans-serif">volume · direction only</text>
+
+  <!-- Arrow L3 → L4 (Mac lane) -->
+  <line x1="200" y1="418" x2="200" y2="448" stroke="#374151" stroke-width="2" fill="none" marker-end="url(#arrow)"/>
+  <!-- Bypass dashed arrow (other devices) -->
+  <line x1="470" y1="418" x2="470" y2="448" stroke="#9ca3af" stroke-width="1.5" stroke-dasharray="4 3" fill="none" marker-end="url(#arrow)"/>
+
+  <!-- LAYER 4: TLS interception — Mac only -->
+  <rect x="100" y="448" width="220" height="84" rx="8" fill="#3c3489" stroke="#afa9ec" stroke-width="1"/>
+  <text x="210" y="472" text-anchor="middle" dominant-baseline="central" fill="#cecbf6" font-size="14" font-weight="500" font-family="system-ui,-apple-system,sans-serif">Layer 4 — TLS interception</text>
+  <text x="210" y="492" text-anchor="middle" dominant-baseline="central" fill="#afa9ec" font-size="12" font-family="system-ui,-apple-system,sans-serif">mitmproxy on Pi</text>
+  <text x="210" y="508" text-anchor="middle" dominant-baseline="central" fill="#afa9ec" font-size="12" font-family="system-ui,-apple-system,sans-serif">Root cert on Mac</text>
+
+  <!-- Bypass L4: other devices -->
+  <rect x="360" y="448" width="220" height="84" rx="8" fill="none" stroke="#9ca3af" stroke-width="1.5" stroke-dasharray="4 3"/>
+  <text x="470" y="480" text-anchor="middle" dominant-baseline="central" fill="#6b7280" font-size="13" font-weight="500" font-family="system-ui,-apple-system,sans-serif">No TLS interception</text>
+  <text x="470" y="500" text-anchor="middle" dominant-baseline="central" fill="#9ca3af" font-size="12" font-family="system-ui,-apple-system,sans-serif">payloads opaque</text>
+
+  <!-- Converge lines from both lanes to Internet -->
+  <line x1="210" y1="532" x2="210" y2="598" stroke="#6b7280" stroke-width="1.5" fill="none"/>
+  <line x1="470" y1="532" x2="470" y2="598" stroke="#9ca3af" stroke-width="1.5" stroke-dasharray="4 3" fill="none"/>
+  <line x1="210" y1="598" x2="470" y2="598" stroke="#6b7280" stroke-width="1.5" fill="none"/>
+  <line x1="340" y1="598" x2="340" y2="618" stroke="#374151" stroke-width="2" fill="none" marker-end="url(#arrow)"/>
+
+  <!-- INTERNET -->
+  <rect x="230" y="618" width="220" height="44" rx="8" fill="#444441" stroke="#b4b2a9" stroke-width="1"/>
+  <text x="340" y="640" text-anchor="middle" dominant-baseline="central" fill="#d3d1c7" font-size="14" font-weight="500" font-family="system-ui,-apple-system,sans-serif">Internet</text>
+
+</svg>

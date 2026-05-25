@@ -7,6 +7,7 @@ import { siteConfig } from '../site.config';
 interface Props {
   title: string;
   description: string;
+  annotation?: string;
   date: Date;
   video_desktop?: string;
   video_mobile?: string;
@@ -21,6 +22,7 @@ interface Props {
 const {
   title,
   description,
+  annotation,
   date,
   video_desktop,
   video_mobile,
@@ -34,6 +36,7 @@ const {
 
 const hasVideo = !!(video_desktop || video_mobile);
 const hasEntrance = hasVideo || !!(poster_desktop || poster_mobile);
+// Note: the 100vh scroll offset is now emitted by VideoEntrance itself as a sibling spacer div.
 const canonicalUrl = Astro.url.href;
 const ogImage = poster_desktop || siteConfig.ogImageDefault;
 
@@ -58,11 +61,11 @@ const ogImage = poster_desktop || siteConfig.ogImageDefault;
       title_appears_at={title_appears_at}
       freeze_at={freeze_at}
       title={title}
-      subtitle={siteConfig.authorFullName}
+      subtitle={annotation ?? siteConfig.authorFullName}
     />
   )}
 
-  <div class:list={['article-outer', { 'mt-[100vh]': hasEntrance }]}>
+  <div class="article-outer">
     <article class="py-16 prose prose-gray max-w-none article-prose">
       <slot />
     </article>
@@ -82,11 +85,7 @@ const ogImage = poster_desktop || siteConfig.ogImageDefault;
   <div id="panel-backdrop" aria-hidden="true"></div>
 
   <style>
-    :global(.article-prose h2),
-    :global(.article-prose h3),
-    :global(.article-prose h4) {
-      font-family: 'Rock Salt', cursive;
-    }
+    /* h2/h3/h4 font is set globally in BaseLayout — no override needed here */
 
     :global(.article-prose > p:first-of-type) {
       font-size: 1.25rem;

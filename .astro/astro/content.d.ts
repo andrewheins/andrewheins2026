@@ -164,7 +164,12 @@ declare module 'astro:content' {
 	};
 
 	type DataEntryMap = {
-		
+		"svg": Record<string, {
+  id: string;
+  collection: "svg";
+  data: any;
+}>;
+
 	};
 
 	type AnyEntryMap = ContentEntryMap & DataEntryMap;
