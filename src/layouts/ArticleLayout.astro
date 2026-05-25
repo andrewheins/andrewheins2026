@@ -33,16 +33,10 @@ const {
 } = Astro.props;
 
 const hasVideo = !!(video_desktop || video_mobile);
+const hasEntrance = hasVideo || !!(poster_desktop || poster_mobile);
 const canonicalUrl = Astro.url.href;
 const ogImage = poster_desktop || siteConfig.ogImageDefault;
 
-const authorSchema = {
-  '@context': 'https://schema.org',
-  '@type': 'Person',
-  name: siteConfig.authorFullName,
-  url: siteConfig.siteBaseUrl,
-  image: siteConfig.headshotUrl,
-};
 ---
 
 <BaseLayout
@@ -52,11 +46,8 @@ const authorSchema = {
   canonicalUrl={canonicalUrl}
   isArticle={true}
 >
-  <Fragment slot="head">
-    <script type="application/ld+json" set:html={JSON.stringify(authorSchema)} />
-  </Fragment>
 
-  {hasVideo && (
+  {hasEntrance && (
     <VideoEntrance
       video_desktop={video_desktop}
       video_mobile={video_mobile}
@@ -71,19 +62,133 @@ const authorSchema = {
     />
   )}
 
-  <div class:list={['max-w-3xl mx-auto px-4', { 'mt-[100vh]': hasVideo }]}>
-    <article class="py-16 prose prose-gray max-w-none">
+  <div class:list={['article-outer', { 'mt-[100vh]': hasEntrance }]}>
+    <article class="py-16 prose prose-gray max-w-none article-prose">
       <slot />
     </article>
 
-    <AuthorBlock
-      name={siteConfig.authorFullName}
-      headshotUrl={siteConfig.headshotUrl}
-      headline={siteConfig.professionalHeadline}
-      employerName={siteConfig.employerName}
-      employerUrl={siteConfig.employerUrl}
-    />
+    <div class="max-w-3xl mx-auto px-4">
+      <AuthorBlock
+        name={siteConfig.authorFullName}
+        headshotUrl={siteConfig.headshotUrl}
+        bio={siteConfig.authorBio}
+        employerName={siteConfig.employerName}
+        employerUrl={siteConfig.employerUrl}
+      />
+    </div>
   </div>
+
+  <!-- Panel backdrop -->
+  <div id="panel-backdrop" aria-hidden="true"></div>
+
+  <style>
+    :global(.article-prose h2),
+    :global(.article-prose h3),
+    :global(.article-prose h4) {
+      font-family: 'Rock Salt', cursive;
+    }
+
+    :global(.article-prose > p:first-of-type) {
+      font-size: 1.25rem;
+      line-height: 1.75;
+      color: #111827;
+    }
+
+    .article-outer {
+      max-width: 56rem; /* wider than 3xl to give room for floating images */
+      margin-left: auto;
+      margin-right: auto;
+      padding-left: 1rem;
+      padding-right: 1rem;
+    }
+
+    /* Constrain prose text to readable width; float children can escape */
+    .article-prose {
+      max-width: 48rem;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    /* Slide main content left when a panel is open — :global because main lives in BaseLayout */
+    :global(main) {
+      transition: transform 0.4s cubic-bezier(0.32, 0.72, 0, 1);
+    }
+
+    :global(main.panel-active) {
+      transform: translateX(-40%);
+    }
+
+    @media (max-width: 640px) {
+      :global(main.panel-active) {
+        transform: translateX(-80%);
+      }
+    }
+
+    #panel-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 40;
+      cursor: pointer;
+    }
+
+    #panel-backdrop.is-visible {
+      display: block;
+    }
+  </style>
+
+  <script>
+    const main = document.querySelector('main');
+    const backdrop = document.getElementById('panel-backdrop');
+
+    // position: fixed elements inside a transformed ancestor are contained by
+    // that ancestor, not the viewport. When main gets translateX(-40%) the panels
+    // would anchor to main instead of the screen edge. Portal them to body first.
+    document.querySelectorAll('.b-line-panel').forEach(p => document.body.appendChild(p));
+    if (backdrop) document.body.appendChild(backdrop);
+
+    function openPanel(panelId: string) {
+      const panel = document.getElementById(`panel-${panelId}`);
+      if (!panel) return;
+      // Hide all panels first
+      document.querySelectorAll('.b-line-panel').forEach((p) => {
+        p.removeAttribute('hidden');
+        (p as HTMLElement).classList.remove('is-open');
+      });
+      panel.removeAttribute('hidden');
+      requestAnimationFrame(() => {
+        panel.classList.add('is-open');
+      });
+      main?.classList.add('panel-active');
+      backdrop?.classList.add('is-visible');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeAllPanels() {
+      document.querySelectorAll('.b-line-panel.is-open').forEach((p) => {
+        p.classList.remove('is-open');
+        p.addEventListener('transitionend', () => p.setAttribute('hidden', ''), { once: true });
+      });
+      main?.classList.remove('panel-active');
+      backdrop?.classList.remove('is-visible');
+      document.body.style.overflow = '';
+    }
+
+    document.addEventListener('bline:open-panel', (e: Event) => {
+      const { panelId } = (e as CustomEvent).detail;
+      openPanel(panelId);
+    });
+
+    backdrop?.addEventListener('click', closeAllPanels);
+
+    document.querySelectorAll('[data-panel-close]').forEach((btn) => {
+      btn.addEventListener('click', closeAllPanels);
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeAllPanels();
+    });
+  </script>
 
   <!-- Scroll depth tracking for articles -->
   <script>

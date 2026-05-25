@@ -45,21 +45,23 @@ const shouldLoop = freeze_at === undefined;
     />
   )}
 
-  <video
-    id="entrance-video"
-    class="absolute inset-0 w-full h-full object-cover z-10"
-    autoplay
-    muted
-    playsinline
-    {...shouldLoop ? { loop: true } : {}}
-  >
-    {video_desktop && (
-      <source src={video_desktop} media="(min-width: 768px)" type="video/mp4" />
-    )}
-    {video_mobile && (
-      <source src={video_mobile} type="video/mp4" />
-    )}
-  </video>
+  {hasVideo && (
+    <video
+      id="entrance-video"
+      class="absolute inset-0 w-full h-full object-cover z-10"
+      autoplay
+      muted
+      playsinline
+      {...shouldLoop ? { loop: true } : {}}
+    >
+      {video_desktop && (
+        <source src={video_desktop} media="(min-width: 768px)" type="video/mp4" />
+      )}
+      {video_mobile && (
+        <source src={video_mobile} type="video/mp4" />
+      )}
+    </video>
+  )}
 
   <!-- Title overlay — fades in at title_appears_at, or immediately if no video -->
   <div
@@ -160,9 +162,12 @@ const shouldLoop = freeze_at === undefined;
   }
 
   // Scroll fade — layer opacity over first 300px of scroll
+  // pointer-events disabled at opacity 0 so the invisible layer doesn't swallow clicks
   function handleScroll() {
     if (entrance) {
-      entrance.style.opacity = String(Math.max(0, 1 - window.scrollY / 300));
+      const opacity = Math.max(0, 1 - window.scrollY / 300);
+      entrance.style.opacity = String(opacity);
+      entrance.style.pointerEvents = opacity === 0 ? 'none' : '';
     }
   }
   window.addEventListener('scroll', handleScroll, { passive: true });

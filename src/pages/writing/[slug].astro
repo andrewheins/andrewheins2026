@@ -1,6 +1,10 @@
 ---
 import { getCollection } from 'astro:content';
 import ArticleLayout from '../../layouts/ArticleLayout.astro';
+import BLineAside from '../../components/BLineAside.astro';
+import BLineImage from '../../components/BLineImage.astro';
+import BLinePanel from '../../components/BLinePanel.astro';
+import BLinePanelTrigger from '../../components/BLinePanelTrigger.astro';
 
 export async function getStaticPaths() {
   const essays = await getCollection('writing', ({ data }) => data.type === 'essay');
@@ -13,6 +17,8 @@ export async function getStaticPaths() {
 const { entry } = Astro.props;
 const { Content } = await entry.render();
 const { data } = entry;
+
+const mdxComponents = { BLineAside, BLineImage, BLinePanel, BLinePanelTrigger };
 ---
 
 <ArticleLayout
@@ -28,5 +34,5 @@ const { data } = entry;
   title_appears_at={data.title_appears_at}
   freeze_at={data.freeze_at}
 >
-  <Content />
+  <Content components={mdxComponents} />
 </ArticleLayout>

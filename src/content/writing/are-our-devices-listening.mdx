@@ -1,0 +1,177 @@
+---
+title: "Are Our Devices Listening to Us?"
+date: 2025-11-01
+description: "I had a conversation about a lawnmower and got a lawnmower ad. I decided to find out what was actually happening on my network — and what I found was more interesting than a yes or no."
+annotation: "Six weeks of network monitoring, a Raspberry Pi, a new router, and 1,300 unaudited connection signatures. I didn't answer my question, but I learned a lot."
+type: essay
+poster_desktop: "https://assets.andrewheins.ca/images/morning-audit-process.png"
+poster_mobile: "https://assets.andrewheins.ca/images/morning-audit-process.png"
+---
+
+Have you ever seen an ad for a product after a conversation near your phone or computer and thought "That's way too convenient to be a coincidence"?
+
+<strong>I did, and I wasn't able to let it slide.</strong>
+
+A few weeks ago, my Mom was in town and stopped by the house. We were chatting over coffee about how the grass was getting long at her place, but her lawn mower wasn't working. My dad passed a few years ago, and we reminisced about how he never wanted consumer-grade lawn equipment, he always wanted commercial and had fantasized about getting a zero-turn lawn mower. 
+
+Hand-to-God, I haven't used the words "Zero-Turn Lawn Mower" in a decade, but as we finished off the conversation and I went back upstairs the very first ad on the very first page I loaded - there it was. 
+
+<BLineImage
+  photo
+  scale={0.5}
+  src="https://assets.andrewheins.ca/images/lawnmower-ad.jpg"
+  alt="a YouTube ad for Eco Gen2 Zero Turn Lawnmowers"
+  caption="The first page, the first ad that I see, as soon as I walk upstairs."
+/>
+
+Whereas I think normally, I wouldn't have noticed or cared about something like this - getting retargeted for something you often search for or show interest in online is totally common - this one I couldn't shake. 
+
+I have about 12 total square feet of grass on my property. I NEVER think about the lawn... let alone maintaining it, and the proximity of this conversation to the conversation just made it too coincidental. It also made me think of my Dad. So I couldn't drop it. 
+
+The idea that your devices could be listening to you is a common conspiracy theory, but it also wasn't conjecture, it turns out - <a href="https://variety.com/2023/digital/news/active-listening-marketers-smartphones-ad-targeting-cox-media-group-1235841007/">Cox Media Group had admitted to such a technology back in 2023</a>. Ambient listening tech on phones was advertised. The product was at least at one time, available. The concept wasn't impossible, but could I figure out if it was happening?
+
+I decided to use this as an excuse to learn more about how the internet REALLY works and maybe find something worth sharing. Being a web guy, my first instinct is to watch the network, so working with Claude, I started working on trying to understand how I could go about answering if my devices were listening.
+
+<BLineAside>
+  The concept of sharing with Claude my concern about being tracked and listened to is not lost on me, and in fact will form the crux of how I approach the problem. 
+
+  One of the main ways I interact with AI (both Claude personally and ChatGPT through my work at Cantilever) is to talk to it either through dictation or through interactive voice sessions. Being able to find and identify those sessions on the network and starting to model what they look like as examples of audio-in-transit, and thereby help model what similar requests out to the internet might look like.
+</BLineAside>
+
+## Missed Connection
+
+The first question was "who's getting my data?" I started by trying to make a list of where my data was going.
+
+<BLineImage
+  src="https://assets.andrewheins.ca/images/yellow-pages-as-dns.png"
+  alt="A touch-tone telephone beside an open Yellow Pages business directory"
+  caption="DNS: the internet's phone book. Every connection starts with a name lookup."
+/>
+
+Given I didn't know which device could have sent the audio, I started from the only common link between them - the household wifi. I grabbed a Raspberry Pi, a versatile microcomputer around the size of a phone, and started the first layer of monitoring - DNS logging.
+
+DNS are like a Yellow Pages. It how you look up what server you contact if you want to connect to a given domain. Think of the domain name (google.com) as the company name, and the IP address (the server's address) as the phone number. Every connection starts with a domain lookup, so I started logging the domains and ip addresses my network was connecting to.
+
+<BLinePanelTrigger panelId="layer-1" label="Layer 1: Pi-hole DNS logging setup" />
+
+It didn't take long to hit a wall here. First off, sites and apps often send data to their own servers and infrastructure, but they also send much of their traffic to external services. If data's being sent to api.anthropic.com (as the chats I was having with Claude were), it's fairly clear what the app or domain is. 
+
+Unfortunately, much of the traffic goes to ip addresses that aren't really connected to meaningful domain names. Moreover, DoH or DNS-over-HTTPS encrypts that lookup and sends it directly to a resolver. It bypassed my DNS logging entirely. 
+
+Going back to the phone call analogy, I was seeing a lot of unlisted numbers, was missing some calls entirely, and I had no idea what the calls were about, so I wasn't getting far. I needed more information.
+
+<BLineAside>
+  This was the first instance of what became a common thread in this experiment - the very privacy protections that companies build in the interest of keeping us safe actual reduce the visibility and control we as the owner have.
+</BLineAside>
+
+## Deeper Inspection
+
+I needed more complete knowledge of the network transmissions, and I probably needed to know the contents as well.
+
+<BLineImage
+  src="https://assets.andrewheins.ca/images/ux7-with-dpi.png"
+  alt="A compact network appliance with a magnifying glass over it revealing a network diagram"
+  caption="The Ubiquiti UX7 — a significant upgrade that brought Deep Packet Inspection to my home network."
+/>
+
+Getting more knowledge about my network transmissions required an investment. My existing router was extremely basic and couldn't do any work itself. It also didn't support port mirroring, which would allow me to send a copy of all my traffic to the pi for logging. I needed an upgrade. 
+
+On the advice of a family member, I picked up a Ubiquiti UX7, which does Deep Packet Inspection (DPI) natively. This gave me exciting new data about what was moving around my network. Not only did I have transmission destinations and timings, but I now know how much data was being sent. Most importantly, I was introduced to the idea of a network signature. Ubiquiti maintains a database of signatures - what certain app traffic looks like on the wire - and maps the traffic to those signatures, allowing me to see "here's how much traffic Slack, Reddit or YouTube is sending around".
+
+I also wanted to understand what was IN the traffic that was moving across my network. By directing traffic through the pi, I was able to capture the entire contents of my internet traffic using tcpdump into pcap files, which I could open and inspect manually. 
+
+<BLinePanelTrigger panelId="layer-2-3" label="Layers 2 & 3: DPI and packet capture setup" />
+
+It was at this point I realized very quickly that in a family home, capturing the full contents of ALL the internet traffic wasn't going to work. Between Roblox and YouTube and Netflix around the house, 30 seconds of capture generated 28GB during a weekend afternoon.
+
+Instead of capturing the entire network's traffic, I settled with just capturing my own laptop's for now, figuring out how to make that work, and then maybe figuring out the device flood later. The other devices on the network, like the TV or our phones were suspicious candidates for "listening", but give the volume of traffic, I'd need to focus on one device first, then scale.
+
+I also realized that I probably didn't care about INCOMING data, it was more about OUTGOING data, so I started working on a way to focus on connection types that sent payloads out, instead of those that tended to bring stuff in.
+
+<BLineAside>
+  Here we find another major issue with this endeavour - there's so *much* data going in and out of our devices, in and out of our networks, that it really is overwhelming in its volume. Even if I could SEE it all, auditing it was going to be a huge problem.I also realized that I probably didn't care about INCOMING data, it was more about OUTGOING data, so I started working on a way to focus on connection types that sent payloads out, instead of those that tended to bring stuff in.
+</BLineAside>
+
+## Crossing the Streams
+
+The next important step was to get the different data I had available to talk to each other. We had DNS logs, we had surface-level DPI from the UX7, and we had packet inspection, but they weren't talking to one-another. We needed information synthesis. This is where I started building out the audit structure.
+
+<BLineImage
+  src="https://assets.andrewheins.ca/images/ghostbusters-crossing-the-streams.png"
+  alt="Ghostbusters characters crossing their proton streams, with the Stay Puft Marshmallow Man looming in the background"
+  caption="Sometimes you have to cross the streams."
+/>
+
+It started as a series of disconnected command line commands to try to link the different sources of information together, identify interesting or suspicious transmissions, and then finds those transmissions in the pcaps and see what's inside.
+
+There's a lot of data to be considered - who's calling? When? Who did they call? How much data was sent? What kind of connection did they use? Was it big enough, long enough or using the right technology to send audio? And if it was, what actually got sent?
+
+Trying to find strategies to identify similar signals, categorize them by source, direction and shape, and then match them together *started* to help with the sheer volume, and started to make clear what some of the common patterns were, but the volume was still overwhelming. I was collecting tens or even hundreds of new connections each day, and managing to audit 1-2 each morning before my kids woke up. There was no hope of keeping up with the flood.
+
+And I was hitting one more wall - I couldn't read most of the contents.
+
+## Encryption
+
+Most data on the web is now encrypted. If you've ever seen HTTPS in front of a web address, that S stands for Secure - or more specifically, encrypted. Instead of just sending information like an envelope with a letter in it, the letter is cryptographically scrambled so that only someone with the key at the other end can decrypt it. And that was 80% of my traffic. 
+
+To make matters worse, encrypted traffic has evolved over the years, and a variety of new connection types were frustratingly opaque. These included QUIC, a newer natively encrypted version of the web's standard HTTP communication, and Websocket transmissions - specifically used for audio/video transmission, which is pretty relevant to "are my devices sending my audio to advertisers".
+
+<BLineImage
+  src="https://assets.andrewheins.ca/images/encrypted-decoder-ring.png"
+  alt="A coded letter addressed 'Hi Mom' with cipher text, alongside a decoder ring cipher wheel and a Wheaties cereal box"
+  caption="Encryption: like getting a letter you can't read without the decoder ring — except the ring is cryptographic and you can't just send away for it."
+/>
+
+The traditional vector for decrypting this traffic is called a "Man-in-the-Middle" or MITM - technically, I'd already set up a basic MITM with the pcap files. The pi sat between my computer and the router reading the traffic , but pcap files don't help me with encrypted traffic. What I really needed was to be able to see through the encryption. 
+
+Long ago, you used to be able to install a "key" to decrypt traffic on the MITM itself, but now keys have to be specifically trusted by the device that's sending data, and so I had to generate my own "key" - a self-signed certificate installed on my Mac that would let the MITM decrypt the traffic. 
+
+The problem here was that every device on the network needed to have its own key installed - and many devices won't really let you. Phones make it hard, TVs and Xboxs make it impossible.
+
+Not only that, but another connection type, WebRTC was completely and intentionally opaque to my methods. And some connections use Certificate Pinning, which identifies exactly which "Key" it trusts, and won't let you use your own. 
+
+So in the end, I had a much better view of the payloads coming off my Mac - probably 80% or more of the traffic was now visible to me, but a fair amount still wasn't, and many devices on the network that could be vectors just weren't reasonable to inspect.
+
+<BLinePanelTrigger panelId="full-architecture" label="Full Four-Layer Architecture Diagram" />
+
+But I still hadn't solved my volume problem - and in fact I'd almost certainly made it worse. 
+
+With real visibility into much of the traffic on the network, it was exciting and enlightening to see the signatures, explore the traffic and see how data moved across the wire. I deconstructed Claude and ChatGPT transcription and voice interactions and saw how they sent data back and forth to transcribe in real time. I described TO Claude in a voice chat what I was seeing about our discussion in real-time. 
+
+All in all, I was enthralled with learning and understanding how these connections were working and what they were doing under the hood - but it all took so much time. The queue and inspection tools I'd built were evolving and getting better and more pointed about the information they were providing, and making it easier to find and audit the payloads of these connections, but I was also opening bigger and bigger cans of worms. 2-3 connections per day were being audit and approved, and by this point my queue had grown to over 1300 different connection signatures. I was looking at a year's work just to catch up to the things
+
+<BLineAside>
+  I was offered several shortcut off-ramps during this period — "why not just feed your MITM logs to Claude and have it scan for audio exfiltration signatures?" I'd considered it. But it wouldn't fix anything real. It would solve one privacy concern by handing a different AI a full transcript of everything I do online. And it wouldn't have taught me anything. It wouldn't have built anything. The whole point was to understand — not to route around the complexity.
+</BLineAside>
+
+---
+
+I want to be clear: this was not an effective or efficient way of answering my question. I inspected a tiny fraction of the signatures I collected. Most threads led somewhere new before they led anywhere conclusive. By any normal measure of research, it went nowhere.
+
+But it taught me more about the actual mechanics of how the web works than anything I've encountered in my professional life. Every site we build at Cantilever rides on top of these protocols — DNS, TLS, HTTP, WebSocket, QUIC — and I spent most of my career treating them as infrastructure I didn't need to look at. Now I've looked at them.
+
+And I still haven't answered the question.
+
+There's going to be a Phase 2. I have a more focused approach in mind — better tooling, a narrower scope, maybe a different entry point into the problem. The lawnmower ad still bothers me. The complexity of what I'd need to prove or disprove it still bothers me more. I'm digging in.
+
+<BLinePanel id="layer-1" title="Layer 1: Pi-hole DNS Logging">
+  <p>The first layer of the monitoring stack was a <a href="https://pi-hole.net/" target="_blank" rel="noopener noreferrer">Pi-hole</a> running on a Raspberry Pi 4, set as the network's DNS resolver.</p>
+  <p><strong>What it captures:</strong> Every DNS lookup made by any device on the network — domain name, IP address, timestamp, and which device made the request.</p>
+  <p><strong>What it misses:</strong> Traffic that uses DNS-over-HTTPS (DoH), which bypasses the local resolver and encrypts the lookup. Many browsers and apps do this by default. Also misses connections that go directly to IP addresses without a DNS lookup.</p>
+  <p><strong>Setup:</strong> Pi-hole runs as the DHCP server; all devices on the network are assigned the Pi's IP as their DNS server. Query logs are stored locally and queryable via the Pi-hole admin dashboard or the sqlite database.</p>
+  <p>Useful for identifying the broad landscape of where traffic is going. Not sufficient alone — it's the starting point, not the answer.</p>
+</BLinePanel>
+
+<BLinePanel id="layer-2-3" title="Layers 2 & 3: DPI + Packet Capture">
+  <p><strong>Layer 2 — Ubiquiti UX7 Deep Packet Inspection:</strong> The UX7 runs Ubiquiti's UniFi OS and provides native DPI, mapping traffic flows to application signatures (Slack, Netflix, TikTok, etc.) with byte counts, duration, and device. This gives a high-level picture of what applications are generating how much traffic, without needing to inspect payloads.</p>
+  <p><strong>Layer 3 — tcpdump via Raspberry Pi:</strong> By configuring my laptop to route traffic through the Pi (acting as a gateway), tcpdump captures the raw packet stream into pcap files. These can be opened in Wireshark for manual inspection.</p>
+  <p><strong>Limitations:</strong> Encrypted payloads are still opaque at this layer. You can see that a 2.4MB upload happened at 11:32am to 142.250.80.46, but not what was in it. Payload inspection requires the MITM certificate layer (Layer 4).</p>
+  <p>The combination of layers 2 and 3 gives you timing, size, destination, and connection type — enough to flag suspicious-looking transmissions for deeper investigation.</p>
+</BLinePanel>
+
+<BLinePanel id="full-architecture" title="Full Monitoring Architecture">
+  <img
+    src="https://assets.andrewheins.ca/svgs/network_audit_architecture_v3.svg"
+    alt="Four-layer monitoring architecture diagram: DNS logging via Pi-hole → deep packet inspection via Ubiquiti UX7 → packet capture via tcpdump on Raspberry Pi → TLS interception via mitmproxy, Mac only"
+  />
+</BLinePanel>

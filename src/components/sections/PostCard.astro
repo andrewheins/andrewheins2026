@@ -29,17 +29,17 @@ const formattedDate = date.toLocaleDateString('en-CA', {
         <h2 class="text-lg font-semibold text-gray-900 group-hover:text-gray-600 transition-colors leading-snug">
           {title}
           {isExternal && (
-            <span class="ml-1 text-gray-400 text-sm font-normal" aria-label="external link">↗</span>
+            <span class="ml-1 text-gray-600 text-sm font-normal" aria-label="external link">↗</span>
           )}
         </h2>
       </a>
       {showAnnotation && (
-        <p class="mt-1 text-gray-500 text-sm leading-relaxed">{annotation}</p>
+        <p class="mt-1 text-gray-600 text-sm leading-relaxed">{annotation}</p>
       )}
     </div>
     <time
       datetime={date.toISOString()}
-      class="text-sm text-gray-400 whitespace-nowrap mt-1 flex-shrink-0"
+      class="text-sm text-gray-600 whitespace-nowrap mt-1 flex-shrink-0"
     >
       {formattedDate}
     </time>

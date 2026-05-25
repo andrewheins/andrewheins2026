@@ -1,5 +1,21 @@
 ---
 import { siteConfig } from '../site.config';
+import Nav from '../components/sections/Nav.astro';
+
+const personSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  name: siteConfig.authorFullName,
+  url: siteConfig.siteBaseUrl,
+  image: siteConfig.headshotUrl,
+  jobTitle: 'President',
+  worksFor: {
+    '@type': 'Organization',
+    name: siteConfig.employerName,
+    url: siteConfig.employerUrl,
+  },
+  sameAs: [siteConfig.linkedInUrl, siteConfig.workBlogAuthorProfileUrl],
+};
 
 interface Props {
   title: string;
@@ -28,6 +44,7 @@ const pageTitle = `${title} — ${siteConfig.authorFullName}`;
     <title>{pageTitle}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={canonicalUrl} />
+    <link rel="icon" href="/favicon.ico" sizes="48x48" />
 
     <!-- Open Graph -->
     <meta property="og:type" content={isArticle ? 'article' : 'website'} />
@@ -80,9 +97,17 @@ const pageTitle = `${title} — ${siteConfig.authorFullName}`;
       });
     </script>
 
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,600;1,400&family=Rock+Salt&display=swap" rel="stylesheet" />
+
+    <script type="application/ld+json" set:html={JSON.stringify(personSchema)} />
+
     <slot name="head" />
   </head>
-  <body class="bg-white text-gray-900 font-sans antialiased">
+  <style>html { font-size: 18px; }</style>
+  <body class="text-gray-900 font-sans antialiased overflow-x-hidden" style="background-color: #f8f5f0; background-image: radial-gradient(ellipse at 50% -5%, #e4ddd2 0%, #f8f5f0 60%);">
+
     <!-- GTM noscript fallback — only meaningful after consent, kept here for spec compliance -->
     <noscript>
       <iframe
@@ -93,18 +118,19 @@ const pageTitle = `${title} — ${siteConfig.authorFullName}`;
       ></iframe>
     </noscript>
 
-    <main>
+    <Nav />
+    <main style="padding-top: 3.5rem;">
       <slot />
     </main>
 
     <footer class="border-t border-gray-100">
-      <div class="max-w-3xl mx-auto px-4 py-8 text-sm text-gray-400 flex items-center justify-between">
+      <div class="max-w-3xl mx-auto px-4 py-8 text-sm text-gray-600 flex items-center justify-between">
         <span>&copy; {new Date().getFullYear()} {siteConfig.authorFullName}</span>
         <a
           href={siteConfig.linkedInUrl}
           target="_blank"
           rel="noopener noreferrer"
-          class="hover:text-gray-600 transition-colors"
+          class="hover:text-gray-900 transition-colors"
         >LinkedIn</a>
       </div>
     </footer>

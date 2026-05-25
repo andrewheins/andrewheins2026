@@ -23,20 +23,6 @@ const pillars = [
   },
 ];
 
-const personSchema = {
-  '@context': 'https://schema.org',
-  '@type': 'Person',
-  name: siteConfig.authorFullName,
-  url: siteConfig.siteBaseUrl,
-  image: siteConfig.headshotUrl,
-  jobTitle: 'President',
-  worksFor: {
-    '@type': 'Organization',
-    name: siteConfig.employerName,
-    url: siteConfig.employerUrl,
-  },
-  sameAs: [siteConfig.linkedInUrl, siteConfig.workBlogAuthorProfileUrl],
-};
 ---
 
 <BaseLayout
@@ -44,9 +30,6 @@ const personSchema = {
   description={`${siteConfig.authorFullName} is President of ${siteConfig.employerName}. Writing about strategy, technology, and what organizations owe the people they build for.`}
   canonicalUrl={Astro.url.href}
 >
-  <Fragment slot="head">
-    <script type="application/ld+json" set:html={JSON.stringify(personSchema)} />
-  </Fragment>
 
   <VideoEntrance
     title="Helping organizations communicate clearly in a world that moves fast."

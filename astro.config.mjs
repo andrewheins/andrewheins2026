@@ -11,4 +11,7 @@ export default defineConfig({
     tailwind(),
     sitemap(),
   ],
+  image: {
+    remotePatterns: [{ hostname: 'assets.andrewheins.ca' }],
+  },
 });

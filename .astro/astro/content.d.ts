@@ -152,23 +152,9 @@ declare module 'astro:content' {
 
 	type ContentEntryMap = {
 		"writing": {
-"sample-curated-one.mdx": {
-	id: "sample-curated-one.mdx";
-  slug: "sample-curated-one";
-  body: string;
-  collection: "writing";
-  data: InferEntrySchema<"writing">
-} & { render(): Render[".mdx"] };
-"sample-essay-one.mdx": {
-	id: "sample-essay-one.mdx";
-  slug: "sample-essay-one";
-  body: string;
-  collection: "writing";
-  data: InferEntrySchema<"writing">
-} & { render(): Render[".mdx"] };
-"sample-essay-two.mdx": {
-	id: "sample-essay-two.mdx";
-  slug: "sample-essay-two";
+"are-our-devices-listening.mdx": {
+	id: "are-our-devices-listening.mdx";
+  slug: "are-our-devices-listening";
   body: string;
   collection: "writing";
   data: InferEntrySchema<"writing">
