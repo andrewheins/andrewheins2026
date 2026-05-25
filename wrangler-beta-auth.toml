@@ -1,0 +1,10 @@
+name = "andrewheins-beta-auth"
+main = "workers/beta-auth.js"
+compatibility_date = "2024-09-01"
+
+[vars]
+# PAGES_HOSTNAME: the .pages.dev hostname for the beta branch
+# Set this and credentials in Cloudflare dashboard under Worker settings:
+# PAGES_HOSTNAME = "beta.andrewheins2026.pages.dev"
+# BETA_USER = "beta"
+# BETA_PASS = "your-password-here"
