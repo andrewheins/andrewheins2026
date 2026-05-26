@@ -55,9 +55,10 @@ const { panelId, label } = Astro.props;
     transition: box-shadow 0.15s;
   }
 
-  .b-line-panel-trigger::after {
-    content: ' ->';
-    padding-left: 0.6rem;
+  @media (max-width: 934px) {
+    .b-line-panel-trigger {
+      margin-right: 0;
+    }
   }
 
   .b-line-panel-trigger:hover {
@@ -96,6 +97,22 @@ const { panelId, label } = Astro.props;
   // Assign sequential indices to all triggers for colour cycling (5 Post-it colours)
   document.querySelectorAll<HTMLButtonElement>('.b-line-panel-trigger').forEach((btn, i) => {
     btn.dataset.markerIndex = String(i % 5);
+
+    // Widont + arrow: split off the last word, wrap it and '->' in a
+    // nowrap span so they can never be separated by a line break.
+    const text = btn.textContent?.trim() ?? '';
+    const lastSpace = text.lastIndexOf(' ');
+    if (lastSpace !== -1) {
+      const before = text.slice(0, lastSpace);
+      const lastWord = text.slice(lastSpace + 1);
+      btn.innerHTML =
+        before +
+        ' <span style="white-space:nowrap">' + lastWord + ' <span style="padding-left:0.3rem">-></span></span>';
+    } else {
+      // Single-word label — just append the arrow
+      btn.innerHTML = text + ' <span style="white-space:nowrap;padding-left:0.3rem">-></span>';
+    }
+
     btn.addEventListener('click', () => {
       const id = btn.dataset.panelId;
       document.dispatchEvent(new CustomEvent('bline:open-panel', { detail: { panelId: id } }));

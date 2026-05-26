@@ -44,12 +44,15 @@ const { id, title } = Astro.props;
     right: 0;
     width: min(56rem, 92vw);
     height: 100dvh;
-    background: #fff;
-    border-left: 1px solid #e5e7eb;
+    background: url('https://assets.andrewheins.ca/images/graph-paper.png') left top / cover no-repeat;
     z-index: 50;
-    transform: translateX(100%);
-    transition: transform 0.4s cubic-bezier(0.32, 0.72, 0, 1);
-    /* Flex column: header is fixed height, body scrolls */
+    /* transform-origin: top right so the panel swings around its bound edge.
+       translateX(130%) ensures the bottom-left corner stays off-screen even
+       when rotated 8deg — calculated as cos(8°) + H/W·sin(8°) ≈ 1.16–1.24,
+       so 1.30 gives comfortable headroom across all aspect ratios. */
+    transform-origin: top right;
+    transform: translateX(130%) rotate(8deg);
+    transition: transform 0.5s cubic-bezier(0.32, 0.72, 0, 1);
     display: flex;
     flex-direction: column;
     overflow: hidden;
@@ -60,13 +63,13 @@ const { id, title } = Astro.props;
   }
 
   .b-line-panel.is-open {
-    transform: translateX(0);
+    transform: translateX(0) rotate(0deg);
   }
 
   /* === Header — always visible === */
   .b-line-panel-header {
     flex-shrink: 0;
-    border-bottom: 1px solid #e5e7eb;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
   }
 
   .b-line-panel-back {
@@ -74,24 +77,23 @@ const { id, title } = Astro.props;
     align-items: center;
     gap: 0.4rem;
     width: 100%;
-    padding: 0.875rem 2rem;
+    padding: 0.875rem 2rem 0.875rem 9.375rem; /* 150px left */
     font-size: 0.8125rem;
     font-weight: 500;
     color: #4b5563;
-    background: #fff;
+    background: transparent;
     cursor: pointer;
     text-align: left;
-    transition: color 0.15s, background-color 0.15s;
+    transition: color 0.15s;
   }
 
   .b-line-panel-back:hover {
     color: #111827;
-    background-color: #f9fafb;
   }
 
   .b-line-panel-title-bar {
-    padding: 0.625rem 2rem 0.875rem;
-    border-top: 1px solid #f3f4f6;
+    padding: 0.625rem 2rem 0.875rem 9.375rem; /* 150px left */
+    border-top: 1px solid rgba(0, 0, 0, 0.06);
   }
 
   .b-line-panel-title {
@@ -107,7 +109,8 @@ const { id, title } = Astro.props;
     flex: 1;
     overflow-y: auto;
     overscroll-behavior: contain;
-    padding: 1.75rem 2rem 2rem;
+    /* 100px top, 150px left — clears the torn binding edge */
+    padding: 6.25rem 2rem 2rem 9.375rem;
     font-size: 0.9rem;
     line-height: 1.7;
     color: #374151;
