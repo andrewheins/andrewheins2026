@@ -48,7 +48,7 @@ Given I didn't know which device could have sent the audio, I started from the o
 
 DNS are like a Yellow Pages. It's how you look up what server you contact if you want to connect to a given domain. Think of the domain name (google.com) as the company name, and the IP address (the server's address) as the phone number. Every connection starts with a domain lookup, so I started logging the domains and ip addresses my network was connecting to.
 
-<BLinePanelTrigger panelId="layer-1" label="Layer 1: Pi-hole DNS logging setup" />
+<BLinePanelTrigger panelId="layer-1" label="Layer 1" />
 
 It didn't take long to hit a wall here. First off, sites and apps often send data to their own servers and infrastructure, but they also send much of their traffic to external services. If data's being sent to api.anthropic.com (as the chats I was having with Claude were), it's fairly clear what the app or domain is. 
 
@@ -76,7 +76,7 @@ On the advice of a family member, I picked up a Ubiquiti UX7, which does **Deep 
 
 I also wanted to understand what was IN the traffic that was moving across my network. By directing traffic through the pi, I was able to capture the entire contents of my internet traffic using tcpdump into pcap files, which I could open and inspect manually. 
 
-<BLinePanelTrigger panelId="layer-2-3" label="Layers 2 & 3: DPI and packet capture setup" />
+<BLinePanelTrigger panelId="layer-2-3" label="Layers 2 & 3" />
 
 It was at this point I realized very quickly that in a family home, capturing the full contents of ALL the internet traffic wasn't going to work. Between Roblox and YouTube and Netflix around the house, **30 seconds of capture generated 28GB of logs** during a weekend afternoon.
 
@@ -139,7 +139,7 @@ Even with that, there was still traffic I couldn't decrypt. WebRTC, which is **r
 
 So in the end, I had a much better view of the payloads coming off my Mac - probably 80% or more of the traffic was now visible to me, but the rest wasn't, and many devices on the network that could be vectors just weren't reasonable to inspect.
 
-<BLinePanelTrigger panelId="full-architecture" label="Full Four-Layer Architecture Diagram" />
+<BLinePanelTrigger panelId="full-architecture" label="Four-Layer Architecture" />
 
 And I still hadn't solved my volume problem - in fact I'd almost certainly made it worse. 
 
