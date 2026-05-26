@@ -9,6 +9,16 @@ const { theme = 'light' } = Astro.props;
 const currentPath = Astro.url.pathname;
 ---
 
+<!-- Hidden SVG filter — frays the tape edges via turbulence displacement -->
+<svg aria-hidden="true" style="position:absolute;width:0;height:0;overflow:hidden">
+  <defs>
+    <filter id="tape-fray" x="-4%" y="-10%" width="108%" height="120%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.065 0.12" numOctaves="3" seed="4" result="noise"/>
+      <feDisplacementMap in="SourceGraphic" in2="noise" scale="4" xChannelSelector="R" yChannelSelector="G"/>
+    </filter>
+  </defs>
+</svg>
+
 <nav class:list={['site-nav', `site-nav--${theme}`]} aria-label="Site navigation">
   <a href="/" class="site-nav-name">
     {siteConfig.authorFullName}
@@ -37,58 +47,64 @@ const currentPath = Astro.url.pathname;
     height: 3.5rem;
   }
 
-  /* === Light theme (default) — dark text on light background === */
-  .site-nav--light .site-nav-name {
+  /* === Tape treatment — shared by name and links === */
+  /* Each element is a strip of scotch tape with text written on it.
+     The tape provides its own surface so text is always dark,
+     regardless of what's behind the nav. */
+  .site-nav-name,
+  .site-nav-link {
+    display: inline-block;
+    padding: 0.35rem 1.1rem;
     font-size: 0.875rem;
     font-weight: 600;
-    color: #111827;
     text-decoration: none;
-    letter-spacing: -0.01em;
-    transition: color 0.15s;
+    color: #2a1f0e;
+    letter-spacing: 0.01em;
+
+    /* Tape surface — white, frosted, less transparent */
+    background: linear-gradient(
+      to bottom,
+      rgba(255, 255, 255, 0.75) 0%,
+      rgba(255, 255, 255, 0.92) 25%,
+      rgba(255, 255, 255, 0.92) 75%,
+      rgba(255, 255, 255, 0.75) 100%
+    );
+
+    /* Tape cut edges */
+    border-left:  1px solid rgba(200, 200, 200, 0.6);
+    border-right: 1px solid rgba(200, 200, 200, 0.6);
+
+    box-shadow:
+      0 2px 5px rgba(0, 0, 0, 0.12),
+      0 1px 2px rgba(0, 0, 0, 0.08);
+
+    filter: url(#tape-fray);
+    transition: opacity 0.15s;
   }
 
-  .site-nav--light .site-nav-name:hover {
-    color: #4b5563;
+  /* Each piece sits at a slightly different angle */
+  .site-nav-name {
+    transform: rotate(-1.8deg);
   }
 
-  .site-nav--light .site-nav-link {
-    font-size: 0.875rem;
-    color: #4b5563;
-    text-decoration: none;
-    transition: color 0.15s;
+  .site-nav-link {
+    transform: rotate(1.2deg);
+    font-weight: 500;
   }
 
-  .site-nav--light .site-nav-link:hover,
-  .site-nav--light .site-nav-link.is-current {
-    color: #111827;
+  .site-nav-name:hover,
+  .site-nav-link:hover {
+    opacity: 0.8;
   }
 
-  /* === Dark theme — white text over dark video / dark background === */
-  .site-nav--dark .site-nav-name {
-    font-size: 0.875rem;
-    font-weight: 600;
-    color: white;
-    text-decoration: none;
-    letter-spacing: -0.01em;
-    transition: color 0.15s;
-    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
-  }
-
-  .site-nav--dark .site-nav-name:hover {
-    color: rgba(255, 255, 255, 0.75);
-  }
-
-  .site-nav--dark .site-nav-link {
-    font-size: 0.875rem;
-    color: rgba(255, 255, 255, 0.8);
-    text-decoration: none;
-    transition: color 0.15s;
-    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
-  }
-
-  .site-nav--dark .site-nav-link:hover,
-  .site-nav--dark .site-nav-link.is-current {
-    color: white;
+  .site-nav-link.is-current {
+    background: linear-gradient(
+      to bottom,
+      rgba(255, 255, 255, 0.85) 0%,
+      rgba(255, 255, 255, 0.97) 25%,
+      rgba(255, 255, 255, 0.97) 75%,
+      rgba(255, 255, 255, 0.85) 100%
+    );
   }
 
   .site-nav-links {
