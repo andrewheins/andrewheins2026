@@ -161,4 +161,24 @@ const { id, title } = Astro.props;
     text-decoration: underline;
     text-underline-offset: 2px;
   }
+
+  /* ── Mobile ───────────────────────────────────────────────────────────── */
+  @media (max-width: 640px) {
+    .b-line-panel {
+      /* Full bleed — a sliver of article still peeks past the binding holes */
+      width: 100vw;
+    }
+
+    .b-line-panel-back {
+      padding-left: 7rem;
+    }
+
+    .b-line-panel-title-bar {
+      padding-left: 7rem;
+    }
+
+    .b-line-panel-body {
+      padding: 3.5rem 1.25rem 2rem 7rem;
+    }
+  }
 </style>
