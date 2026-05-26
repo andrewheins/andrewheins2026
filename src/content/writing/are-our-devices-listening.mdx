@@ -120,11 +120,15 @@ To make matters worse, encrypted traffic has evolved over the years, and a varie
 
 The traditional vector for decrypting this traffic is called a "Man-in-the-Middle" or MITM - technically, I'd already set up a basic MITM with the pcap files. The pi sat between my computer and the router reading the traffic , but pcap files don't help me with encrypted traffic. What I really needed was to be able to see through the encryption. 
 
+Enter mitmproxy. Installed on the pi, it could unlock the payload of anything that came across the wire - assuming the device had a trusted "key".
+
 Long ago, you used to be able to install a "key" to decrypt traffic on the MITM itself, but now keys have to be specifically trusted by the device that's sending data, and so I had to generate my own "key" - a self-signed certificate installed on my Mac that would let the MITM decrypt the traffic. 
 
-The problem here was that every device on the network needed to have its own key installed - and many devices won't really let you. Phones make it hard, TVs and Xboxs make it impossible.
 
-Not only that, but WebRTC, which is **really** what you'd use if you were trying to send backdoor audio without being noticed, was completely and intentionally opaque to my methods. And some connections use Certificate Pinning, which identifies exactly which "Key" it trusts, and won't let you use your own. 
+
+The problem here was that every device on the network needed to have its own key installed - and many devices won't really let you. Phones make it hard, TVs and Xboxs make it impossible. As a result, again I chose to focus on my laptop, and leave the payloads from other devices indecipherable for now.
+
+Even with that, there was still traffic I couldn't decrypt. WebRTC, which is **really** what you'd use if you were trying to send backdoor audio without being noticed, is encrypted end-to-end by design — mitmproxy can't touch it. And some connections use Certificate Pinning, which identifies exactly which "Key" it trusts, and won't let you use your own. 
 
 <BLineImage
   photo
@@ -195,6 +199,6 @@ There's already going to be a Phase 2 to this project, with a refocused approach
   <p><strong>Layer 1 — DNS logging:</strong> Pi-hole intercepts every domain lookup on the network. Fast to set up, broad coverage, but blind to DoH traffic and direct-IP connections.</p>
   <p><strong>Layer 2 — Deep packet inspection:</strong> The Ubiquiti UX7 classifies traffic by application signature across all devices — Slack, YouTube, TikTok — with byte counts and direction. No payload visibility, but useful for spotting unusual volume or timing on any device.</p>
   <p><strong>Layer 3 — Packet capture:</strong> Mac traffic routed through the Raspberry Pi, captured raw via tcpdump into pcap files. Everything is visible at the packet level — except the payload of encrypted connections.</p>
-  <p><strong>Layer 4 — TLS interception:</strong> mitmproxy running on the Pi, with a self-signed root certificate trusted by the Mac. Decrypts most HTTPS traffic in transit. Defeated by certificate pinning and WebRTC, which are intentionally opaque by design.</p>
+  <p><strong>Layer 4 — TLS interception:</strong> mitmproxy running on the Pi, with a self-signed root certificate trusted by the Mac. Decrypts most HTTPS traffic in transit. Defeated by certificate pinning and WebRTC, which are opaque by design.</p>
   <p>What the full stack still can't see: DoH lookups from other devices, any traffic from the iPhone or TV at the payload level, WebRTC audio and video streams, and anything using certificate pinning. The gaps are not small.</p>
 </BLinePanel>
