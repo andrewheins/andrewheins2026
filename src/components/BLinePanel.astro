@@ -22,10 +22,13 @@ const { id, title } = Astro.props;
       aria-label="Close panel and return to article"
       data-panel-close
     >
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-        <polyline points="15 18 9 12 15 6"/>
-      </svg>
-      Back to article
+      <!-- Tape strip wraps only the label so it sizes to content, not full width -->
+      <span class="b-line-panel-back-tape">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <polyline points="15 18 9 12 15 6"/>
+        </svg>
+        Back to article
+      </span>
     </button>
     <div class="b-line-panel-title-bar">
       <span class="b-line-panel-title">{title}</span>
@@ -38,6 +41,7 @@ const { id, title } = Astro.props;
 </div>
 
 <style>
+  /* ── Panel ────────────────────────────────────────────────────────────── */
   .b-line-panel {
     position: fixed;
     top: 0;
@@ -46,10 +50,6 @@ const { id, title } = Astro.props;
     height: 100dvh;
     background: url('https://assets.andrewheins.ca/images/graph-paper.png') left top / cover no-repeat;
     z-index: 50;
-    /* transform-origin: top right so the panel swings around its bound edge.
-       translateX(130%) ensures the bottom-left corner stays off-screen even
-       when rotated 8deg — calculated as cos(8°) + H/W·sin(8°) ≈ 1.16–1.24,
-       so 1.30 gives comfortable headroom across all aspect ratios. */
     transform-origin: top right;
     transform: translateX(130%) rotate(8deg);
     transition: transform 0.5s cubic-bezier(0.32, 0.72, 0, 1);
@@ -66,45 +66,73 @@ const { id, title } = Astro.props;
     transform: translateX(0) rotate(0deg);
   }
 
-  /* === Header — always visible === */
+  /* ── Header ───────────────────────────────────────────────────────────── */
   .b-line-panel-header {
     flex-shrink: 0;
     border-bottom: 1px solid rgba(0, 0, 0, 0.08);
   }
 
+  /* Full-width click target; the tape visual lives on the inner span */
   .b-line-panel-back {
     display: flex;
     align-items: center;
-    gap: 0.4rem;
     width: 100%;
-    padding: 0.875rem 2rem 0.875rem 9.375rem; /* 150px left */
-    font-size: 0.8125rem;
-    font-weight: 500;
-    color: #4b5563;
+    padding: 0.875rem 2rem 0.875rem 9.375rem; /* 150px left clears binding */
     background: transparent;
+    border: none;
     cursor: pointer;
-    text-align: left;
-    transition: color 0.15s;
   }
 
-  .b-line-panel-back:hover {
-    color: #111827;
+  /* Scotch-tape strip — mirrors the Nav tape treatment */
+  .b-line-panel-back-tape {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    position: relative;
+    padding: 0.3rem 0.85rem;
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: #2a1f0e;
+    transform: rotate(-0.7deg);
+  }
+
+  .b-line-panel-back-tape::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: linear-gradient(
+      to bottom,
+      rgba(255, 255, 255, 0.75) 0%,
+      rgba(255, 255, 255, 0.92) 25%,
+      rgba(255, 255, 255, 0.92) 75%,
+      rgba(255, 255, 255, 0.75) 100%
+    );
+    border-left:  1px solid rgba(200, 200, 200, 0.6);
+    border-right: 1px solid rgba(200, 200, 200, 0.6);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.08);
+    filter: url(#tape-fray);
+  }
+
+  .b-line-panel-back:hover .b-line-panel-back-tape {
+    opacity: 0.8;
   }
 
   .b-line-panel-title-bar {
-    padding: 0.625rem 2rem 0.875rem 9.375rem; /* 150px left */
-    border-top: 1px solid rgba(0, 0, 0, 0.06);
+    padding: 0.5rem 2rem 1rem 9.375rem; /* 150px left */
   }
 
+  /* Rock Salt h2-style title */
   .b-line-panel-title {
-    font-size: 0.8125rem;
-    font-weight: 600;
-    color: #374151;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
+    font-family: 'Rock Salt', cursive;
+    font-size: 1rem;
+    font-weight: 400;
+    color: #2a1f0e;
+    line-height: 1.4;
+    letter-spacing: 0.01em;
   }
 
-  /* === Body — scrollable === */
+  /* ── Body ─────────────────────────────────────────────────────────────── */
   .b-line-panel-body {
     flex: 1;
     overflow-y: auto;

@@ -149,7 +149,7 @@ const ogImage = poster_desktop || siteConfig.ogImageDefault;
     function openPanel(panelId: string) {
       const panel = document.getElementById(`panel-${panelId}`);
       if (!panel) return;
-      // Hide all panels first
+      // Reset all panels
       document.querySelectorAll('.b-line-panel').forEach((p) => {
         p.removeAttribute('hidden');
         (p as HTMLElement).classList.remove('is-open');
