@@ -23,6 +23,7 @@ interface Props {
   ogImage?: string;
   canonicalUrl?: string;
   isArticle?: boolean;
+  navTheme?: 'light' | 'dark';
 }
 
 const {
@@ -31,6 +32,7 @@ const {
   ogImage = siteConfig.ogImageDefault,
   canonicalUrl = Astro.url.href,
   isArticle = false,
+  navTheme = 'light',
 } = Astro.props;
 
 const pageTitle = `${title} — ${siteConfig.authorFullName}`;
@@ -121,7 +123,7 @@ const pageTitle = `${title} — ${siteConfig.authorFullName}`;
       ></iframe>
     </noscript>
 
-    <Nav />
+    <Nav theme={navTheme} />
     <main>
       <slot />
     </main>

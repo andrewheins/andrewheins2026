@@ -37,18 +37,25 @@ const shouldLoop = freeze_at === undefined;
 <div aria-hidden="true" style="height: 100vh"></div>
 
 <div id="video-entrance" class="fixed inset-0 z-50 bg-black overflow-hidden">
-  <!-- Poster: pre-load fallback behind video; revealed on freeze -->
-  {poster_desktop && (
-    <img
-      id="video-poster"
-      src={poster_desktop}
-      alt=""
-      aria-hidden="true"
-      loading="eager"
-      fetchpriority="high"
-      class="absolute inset-0 w-full h-full object-cover"
-      style={`object-position: ${focus_desktop}`}
-    />
+  <!-- Poster: pre-load fallback behind video; revealed on freeze.
+       <picture> lets mobile fetch only the mobile source; the <img> id
+       is preserved so the JS focus/freeze logic still works. -->
+  {(poster_desktop || poster_mobile) && (
+    <picture>
+      {poster_mobile && (
+        <source media="(max-width: 767px)" srcset={poster_mobile} />
+      )}
+      <img
+        id="video-poster"
+        src={poster_desktop ?? poster_mobile}
+        alt=""
+        aria-hidden="true"
+        loading="eager"
+        fetchpriority="high"
+        class="absolute inset-0 w-full h-full object-cover"
+        style={`object-position: ${focus_desktop}`}
+      />
+    </picture>
   )}
 
   {hasVideo && (
@@ -93,7 +100,7 @@ const shouldLoop = freeze_at === undefined;
     <button
       id="mute-toggle"
       type="button"
-      class="absolute top-4 right-4 z-30 bg-black/40 hover:bg-black/60 text-white rounded-full p-2 transition-colors"
+      class="absolute top-16 right-4 z-30 bg-black/40 hover:bg-black/60 text-white rounded-full p-2 transition-colors"
       aria-label="Unmute video"
     >
       <svg id="icon-muted" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">

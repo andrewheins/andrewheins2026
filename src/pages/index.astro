@@ -29,19 +29,20 @@ const pillars = [
   title={siteConfig.authorFullName}
   description={`${siteConfig.authorFullName} is President of ${siteConfig.employerName}. Writing about strategy, technology, and what organizations owe the people they build for.`}
   canonicalUrl={Astro.url.href}
+  navTheme="dark"
 >
 
   <VideoEntrance
-    title="Helping organizations communicate clearly in a world that moves fast."
-    subtitle={`I'm ${siteConfig.authorFullName}, President at ${siteConfig.employerName}, a digital agency. I've been on the internet since MUDs and Geocities, and I'm still trying to figure out what we built. I still think we can deliver on the promise we saw in it as kids.`}
+    video_desktop="https://assets.andrewheins.ca/video/Rainy%20Mountain.mp4"
+    video_mobile="https://assets.andrewheins.ca/video/Rainy%20Mountain.mp4"
+    title={`${siteConfig.authorFullName}`}
+    subtitle={`President at ${siteConfig.employerName}, a digital agency. I've been on the internet since MUDs and Geocities, and I'm still trying to figure out what we built. I still think we can deliver on the promise we saw in it as kids.`}
   />
 
-  <IntroBlock body="I've spent the better part of fifteen years helping organizations figure out what they're actually trying to say — and then build the digital infrastructure to say it reliably. I'm President of Cantilever, a digital agency that works with companies serious about their digital presence. I write here about strategy, technology, and the harder questions underneath both: what we're building, who it's for, and whether the tools we're using are actually serving the outcomes we care about." />
-
-  {/* Writing section — hidden until writing section launches */}
-  {/* <PostList posts={[]} showAnnotation={true} /> */}
+  <IntroBlock body="Welcome to my website. Don't forget to sign the guestbook." />
 
   <PillarCards
+    title="How I Think"
     intro="A few principles have shaped how I think about this work. They're not a framework I invented — they're patterns I kept running into until I started taking them seriously."
     pillars={pillars}
   />
