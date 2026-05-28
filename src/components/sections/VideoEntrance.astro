@@ -1,4 +1,6 @@
 ---
+import { Image } from 'astro:assets';
+
 // Performance budget: desktop video ≤ 8MB, mobile video ≤ 4MB,
 // poster images ≤ 200KB each.
 
@@ -6,7 +8,6 @@ interface Props {
   video_desktop?: string;
   video_mobile?: string;
   poster_desktop?: string;
-  poster_mobile?: string;
   focus_desktop?: string;
   focus_mobile?: string;
   title_appears_at?: number;
@@ -19,7 +20,6 @@ const {
   video_desktop,
   video_mobile,
   poster_desktop,
-  poster_mobile,
   focus_desktop = '50% 50%',
   focus_mobile = '50% 50%',
   title_appears_at,
@@ -37,25 +37,23 @@ const shouldLoop = freeze_at === undefined;
 <div aria-hidden="true" style="height: 100vh"></div>
 
 <div id="video-entrance" class="fixed inset-0 z-50 bg-black overflow-hidden">
-  <!-- Poster: pre-load fallback behind video; revealed on freeze.
-       <picture> lets mobile fetch only the mobile source; the <img> id
-       is preserved so the JS focus/freeze logic still works. -->
-  {(poster_desktop || poster_mobile) && (
-    <picture>
-      {poster_mobile && (
-        <source media="(max-width: 767px)" srcset={poster_mobile} />
-      )}
-      <img
-        id="video-poster"
-        src={poster_desktop ?? poster_mobile}
-        alt=""
-        aria-hidden="true"
-        loading="eager"
-        fetchpriority="high"
-        class="absolute inset-0 w-full h-full object-cover"
-        style={`object-position: ${focus_desktop}`}
-      />
-    </picture>
+  <!-- Poster: converted to WebP at build time via Astro Image (1280px, q65).
+       id is preserved so JS focus/freeze logic still works. -->
+  {poster_desktop && (
+    <Image
+      id="video-poster"
+      src={poster_desktop}
+      alt=""
+      aria-hidden="true"
+      loading="eager"
+      fetchpriority="high"
+      width={1280}
+      height={720}
+      quality={65}
+      format="webp"
+      class="absolute inset-0 w-full h-full object-cover"
+      style={`object-position: ${focus_desktop}`}
+    />
   )}
 
   {hasVideo && (

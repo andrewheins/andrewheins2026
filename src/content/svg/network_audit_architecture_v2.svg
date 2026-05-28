@@ -1,6 +1,6 @@
-<svg width="100%" viewBox="80 10 520 360" role="img" xmlns="http://www.w3.org/2000/svg">
-  <title>Layers 2 and 3 network audit architecture — devices through DPI and packet capture to internet</title>
-  <desc>Data flow diagram showing all household devices passing through Ubiquiti UX7 deep packet inspection (Layer 2), with Mac traffic additionally routed through tcpdump on Raspberry Pi for packet capture (Layer 3), before reaching the internet.</desc>
+<svg width="100%" viewBox="80 10 520 460" role="img" xmlns="http://www.w3.org/2000/svg">
+  <title>Layers 1–3 network audit architecture — devices through DNS logging, DPI, and packet capture to internet</title>
+  <desc>Data flow diagram showing all household devices passing through Pi-hole DNS logging (Layer 1), then Ubiquiti UX7 deep packet inspection (Layer 2), with Mac traffic additionally routed through tcpdump on Raspberry Pi for packet capture (Layer 3), before reaching the internet.</desc>
 
   <defs>
     <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
@@ -18,31 +18,39 @@
   <rect x="428" y="30" width="148" height="44" rx="8" fill="#444441" stroke="#b4b2a9" stroke-width="1"/>
   <text x="502" y="52" text-anchor="middle" dominant-baseline="central" fill="#d3d1c7" font-size="14" font-weight="500" font-family="system-ui,-apple-system,sans-serif">Smart TV + 7</text>
 
-  <!-- Converge lines from devices to Layer 2 -->
-  <line x1="174" y1="74" x2="174" y2="100" stroke="#6b7280" stroke-width="1.5" fill="none"/>
-  <line x1="338" y1="74" x2="338" y2="100" stroke="#6b7280" stroke-width="1.5" fill="none"/>
-  <line x1="502" y1="74" x2="502" y2="100" stroke="#6b7280" stroke-width="1.5" fill="none"/>
-  <line x1="174" y1="100" x2="502" y2="100" stroke="#6b7280" stroke-width="1.5" fill="none"/>
-  <line x1="340" y1="100" x2="340" y2="118" stroke="#374151" stroke-width="2" fill="none" marker-end="url(#arrow)"/>
+  <!-- Converge lines from devices to Layer 1 -->
+  <line x1="174" y1="74" x2="174" y2="100" stroke="#6b7280" stroke-width="1.5"/>
+  <line x1="338" y1="74" x2="338" y2="100" stroke="#6b7280" stroke-width="1.5"/>
+  <line x1="502" y1="74" x2="502" y2="100" stroke="#6b7280" stroke-width="1.5"/>
+  <line x1="174" y1="100" x2="502" y2="100" stroke="#6b7280" stroke-width="1.5"/>
+  <line x1="340" y1="100" x2="340" y2="118" stroke="#374151" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <!-- LAYER 1: DNS Logging -->
+  <rect x="100" y="118" width="480" height="70" rx="8" fill="#085041" stroke="#5dcaa5" stroke-width="1"/>
+  <text x="340" y="142" text-anchor="middle" dominant-baseline="central" fill="#9fe1cb" font-size="14" font-weight="500" font-family="system-ui,-apple-system,sans-serif">Layer 1 — DNS Logging</text>
+  <text x="340" y="162" text-anchor="middle" dominant-baseline="central" fill="#5dcaa5" font-size="12" font-family="system-ui,-apple-system,sans-serif">Pi-hole · every domain lookup, timestamped per device</text>
+
+  <!-- Arrow L1 → L2 -->
+  <line x1="340" y1="188" x2="340" y2="218" stroke="#374151" stroke-width="2" marker-end="url(#arrow)"/>
 
   <!-- LAYER 2: Deep Packet Inspection -->
-  <rect x="100" y="118" width="480" height="70" rx="8" fill="#085041" stroke="#5dcaa5" stroke-width="1"/>
-  <text x="340" y="142" text-anchor="middle" dominant-baseline="central" fill="#9fe1cb" font-size="14" font-weight="500" font-family="system-ui,-apple-system,sans-serif">Layer 2 — Deep Packet Inspection</text>
-  <text x="340" y="162" text-anchor="middle" dominant-baseline="central" fill="#5dcaa5" font-size="12" font-family="system-ui,-apple-system,sans-serif">Ubiquiti UX7 · app identity, volume, direction · all devices</text>
+  <rect x="100" y="218" width="480" height="70" rx="8" fill="#085041" stroke="#5dcaa5" stroke-width="1"/>
+  <text x="340" y="242" text-anchor="middle" dominant-baseline="central" fill="#9fe1cb" font-size="14" font-weight="500" font-family="system-ui,-apple-system,sans-serif">Layer 2 — Deep Packet Inspection</text>
+  <text x="340" y="262" text-anchor="middle" dominant-baseline="central" fill="#5dcaa5" font-size="12" font-family="system-ui,-apple-system,sans-serif">Ubiquiti UX7 · app identity, volume, direction · all devices</text>
 
   <!-- Arrow L2 → L3 -->
-  <line x1="340" y1="188" x2="340" y2="218" stroke="#374151" stroke-width="2" fill="none" marker-end="url(#arrow)"/>
+  <line x1="340" y1="288" x2="340" y2="318" stroke="#374151" stroke-width="2" marker-end="url(#arrow)"/>
 
   <!-- LAYER 3: Packet Capture -->
-  <rect x="100" y="218" width="480" height="70" rx="8" fill="#085041" stroke="#5dcaa5" stroke-width="1" stroke-dasharray="6 3"/>
-  <text x="340" y="242" text-anchor="middle" dominant-baseline="central" fill="#9fe1cb" font-size="14" font-weight="500" font-family="system-ui,-apple-system,sans-serif">Layer 3 — Packet Capture</text>
-  <text x="340" y="262" text-anchor="middle" dominant-baseline="central" fill="#5dcaa5" font-size="12" font-family="system-ui,-apple-system,sans-serif">tcpdump · Raspberry Pi · pcap files · Mac only</text>
+  <rect x="100" y="318" width="480" height="70" rx="8" fill="#085041" stroke="#5dcaa5" stroke-width="1" stroke-dasharray="6 3"/>
+  <text x="340" y="342" text-anchor="middle" dominant-baseline="central" fill="#9fe1cb" font-size="14" font-weight="500" font-family="system-ui,-apple-system,sans-serif">Layer 3 — Packet Capture</text>
+  <text x="340" y="362" text-anchor="middle" dominant-baseline="central" fill="#5dcaa5" font-size="12" font-family="system-ui,-apple-system,sans-serif">tcpdump · Raspberry Pi · pcap files · Mac only</text>
 
   <!-- Arrow L3 → Internet -->
-  <line x1="340" y1="288" x2="340" y2="318" stroke="#374151" stroke-width="2" fill="none" marker-end="url(#arrow)"/>
+  <line x1="340" y1="388" x2="340" y2="418" stroke="#374151" stroke-width="2" marker-end="url(#arrow)"/>
 
   <!-- INTERNET -->
-  <rect x="230" y="318" width="220" height="44" rx="8" fill="#444441" stroke="#b4b2a9" stroke-width="1"/>
-  <text x="340" y="340" text-anchor="middle" dominant-baseline="central" fill="#d3d1c7" font-size="14" font-weight="500" font-family="system-ui,-apple-system,sans-serif">Internet</text>
+  <rect x="230" y="418" width="220" height="44" rx="8" fill="#444441" stroke="#b4b2a9" stroke-width="1"/>
+  <text x="340" y="440" text-anchor="middle" dominant-baseline="central" fill="#d3d1c7" font-size="14" font-weight="500" font-family="system-ui,-apple-system,sans-serif">Internet</text>
 
 </svg>

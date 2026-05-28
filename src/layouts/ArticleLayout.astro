@@ -55,7 +55,6 @@ const ogImage = poster_desktop || siteConfig.ogImageDefault;
       video_desktop={video_desktop}
       video_mobile={video_mobile}
       poster_desktop={poster_desktop}
-      poster_mobile={poster_mobile}
       focus_desktop={focus_desktop}
       focus_mobile={focus_mobile}
       title_appears_at={title_appears_at}
@@ -114,12 +113,14 @@ const ogImage = poster_desktop || siteConfig.ogImageDefault;
     }
 
     :global(main.panel-active) {
-      transform: translateX(-40%);
+      /* -50% matches the 50vw panel — article and panel each own half the screen */
+      transform: translateX(-50%);
     }
 
     @media (max-width: 640px) {
       :global(main.panel-active) {
-        transform: translateX(-80%);
+        /* Panel is 100vw on mobile — shift article fully off-screen */
+        transform: translateX(-100%);
       }
     }
 

@@ -64,10 +64,12 @@ const pageTitle = `${title} — ${siteConfig.authorFullName}`;
     <!-- RSS -->
     <link rel="alternate" type="application/rss+xml" title={`${siteConfig.authorFullName} — Writing`} href="/rss.xml" />
 
-    <!-- CookieYes — loads before GTM, sets consent defaults -->
+    <!-- CookieYes — async so it doesn't block rendering; consent defaults below
+         are set synchronously before this script executes, preserving PIPEDA compliance -->
     <script
       id="cookieyes"
       type="text/javascript"
+      async
       src={`https://cdn-cookieyes.com/client_data/${siteConfig.cookieYesScriptId}/script.js`}
     ></script>
 
@@ -101,7 +103,16 @@ const pageTitle = `${title} — ${siteConfig.authorFullName}`;
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,600;1,400&family=Rock+Salt&display=swap" rel="stylesheet" />
+    <!-- Async font loading — eliminates render-blocking; noscript fallback for non-JS environments -->
+    <link
+      rel="preload"
+      as="style"
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,600;1,400&family=Rock+Salt&display=swap"
+      onload="this.onload=null;this.rel='stylesheet'"
+    />
+    <noscript>
+      <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,600;1,400&family=Rock+Salt&display=swap" />
+    </noscript>
 
     <script type="application/ld+json" set:html={JSON.stringify(personSchema)} />
 
