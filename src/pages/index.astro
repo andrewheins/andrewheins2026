@@ -48,14 +48,17 @@ const pillars = [
   />
 
   <WorkBlock
-    body={`I'm President of ${siteConfig.employerName}, a digital agency that builds and grows digital presences for organizations serious about their online footprint. We do strategy, design, and development — and we're honest about which problems we can solve and which ones we can't.`}
-    ctaText={`${siteConfig.employerName} is the place to start →`}
+    body={`I'm President of ${siteConfig.employerName}, a digital agency  I've been part of since 2012. We build and maintain websites for organizations that take their digital presence seriously — strategy, design, and development, from a team that's been doing this long enough to know how to get you real results.`}
+    ctaPrefix="If you're thinking about your website, "
+    ctaLinkText="we'd like to talk"
     ctaUrl={`${siteConfig.employerUrl}?utm_source=andrewheins.ca&utm_medium=personal_site&utm_campaign=work_section`}
+    stickerUrl={`${siteConfig.assetBaseUrl}/images/cantilever-sticker.png`}
   />
 
   <ContactSection
     heading="Get in touch"
     intro={`I'm reachable by email and on LinkedIn. If you have a question about digital strategy, want to discuss something I've written, or are interested in working with ${siteConfig.employerName}, I'd like to hear from it.`}
+    email={siteConfig.contactEmail}
     linkedInUrl={siteConfig.linkedInUrl}
   >
     <ContactForm workerEndpoint={siteConfig.workerEndpoint} />

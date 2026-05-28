@@ -1,21 +1,64 @@
 ---
 interface Props {
   body: string;
-  ctaText: string;
+  ctaPrefix: string;
+  ctaLinkText: string;
   ctaUrl: string;
+  stickerUrl?: string;
 }
 
-const { body, ctaText, ctaUrl } = Astro.props;
+const { body, ctaPrefix, ctaLinkText, ctaUrl, stickerUrl } = Astro.props;
 ---
 
 <section class="max-w-3xl mx-auto px-6 py-16 border-t border-gray-100">
-  <p class="text-gray-700 leading-relaxed mb-5">{body}</p>
-  <a
-    href={ctaUrl}
-    target="_blank"
-    rel="noopener noreferrer"
-    class="text-gray-900 font-medium hover:underline"
-  >
-    {ctaText}
-  </a>
+  <div class="workblock-inner">
+    {stickerUrl && (
+      <div class="workblock-sticker-wrap" aria-hidden="true">
+        <img src={stickerUrl} alt="" class="workblock-sticker" />
+      </div>
+    )}
+    <div class="workblock-content">
+      <p class="text-gray-700 leading-relaxed mb-5">{body}</p>
+      <p class="text-gray-700 leading-relaxed">
+        {ctaPrefix}<a
+          href={ctaUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="text-gray-900 font-medium underline underline-offset-2 hover:text-gray-600"
+        >{ctaLinkText}</a>.
+      </p>
+    </div>
+  </div>
 </section>
+
+<style>
+  .workblock-inner {
+    display: flex;
+    align-items: center;
+    gap: 2.5rem;
+  }
+
+  .workblock-sticker-wrap {
+    flex-shrink: 0;
+    width: 7rem;
+  }
+
+  .workblock-sticker {
+    width: 100%;
+    height: auto;
+    display: block;
+    transform: rotate(-4deg);
+    filter: drop-shadow(1px 2px 3px rgba(0, 0, 0, 0.35));
+  }
+
+  .workblock-content {
+    flex: 1;
+    min-width: 0;
+  }
+
+  @media (max-width: 480px) {
+    .workblock-sticker-wrap {
+      width: 5rem;
+    }
+  }
+</style>
