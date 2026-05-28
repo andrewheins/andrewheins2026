@@ -1,11 +1,20 @@
 ---
-// Author interjection — watercolor splotch background, text centered on top
+import { getImage } from 'astro:assets';
+
+const splotch = await getImage({
+  src: 'https://assets.andrewheins.ca/images/splotch-light-cropped.png',
+  format: 'webp',
+  quality: 80,
+  width: 1200,
+  height: 548,
+});
 ---
 <aside class="b-line-aside not-prose">
   <img
-    src="https://assets.andrewheins.ca/images/splotch-light-cropped.png"
+    src={splotch.src}
     alt=""
     aria-hidden="true"
+    loading="lazy"
     class="b-line-aside-bg"
   />
   <div class="b-line-aside-inner">

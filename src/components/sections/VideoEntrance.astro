@@ -77,7 +77,7 @@ const shouldLoop = freeze_at === undefined;
   <!-- Title overlay — fades in at title_appears_at, or immediately if no video -->
   <div
     id="video-overlay"
-    class="absolute inset-0 z-20 flex flex-col justify-end items-center text-center px-8 pb-14 opacity-0 transition-opacity duration-700"
+    class:list={['absolute inset-0 z-20 flex flex-col justify-end items-center text-center px-8 pb-14 transition-opacity duration-700', hasVideo && 'opacity-0']}
     style="background: linear-gradient(transparent 15%, rgba(0,0,0,0.4) 45%, rgba(0,0,0,0.82) 100%)"
   >
     <h1 class="text-white text-4xl md:text-6xl font-bold mb-4 max-w-2xl leading-tight" style="text-shadow: 0 2px 16px rgba(0,0,0,0.55), 0 1px 4px rgba(0,0,0,0.4)">
