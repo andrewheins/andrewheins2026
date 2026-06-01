@@ -26,7 +26,7 @@ const pillars = [
   },
   {
     title: 'Tech as an Enabler, not an End',
-    body: "While technology changes fast, your basic business promises probably don't. Technology can be a tool to help you deliver, and I help decipher what worth chasing, and what's just a trend.",
+    body: "While technology changes fast, your basic business promises probably don't. Technology can be a tool to help you deliver, and I help decipher what's worth chasing, and what's just a trend.",
   },
   {
     title: 'People First',
@@ -38,7 +38,8 @@ const pillars = [
 
 <BaseLayout
   title={siteConfig.authorFullName}
-  description={`${siteConfig.authorFullName} is President of ${siteConfig.employerName}.`}
+  overrideTitle={`${siteConfig.authorFullName} — President, ${siteConfig.employerName}`}
+  description="I've been on the internet since MUDs and Geocities, and I'm still trying to figure out what we built. President of Cantilever, a digital agency."
   canonicalUrl={Astro.url.href}
   navTheme="dark"
   navOverHero={true}
