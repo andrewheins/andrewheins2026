@@ -124,17 +124,21 @@ const pageTitle = `${title} — ${siteConfig.authorFullName}`;
           });
         }
 
-        // Fires when the user interacts with the consent banner
-        document.addEventListener('cookieyes-consent-update', function (event) {
-          var detail = event.detail || {};
+        // CookieYes dispatches on both document and window depending on version —
+        // listen on both to be safe
+        function onConsentUpdate(event) {
+          var detail = (event && event.detail) || {};
           if (detail.analytics === 'yes') loadGA4();
-        });
+        }
+        document.addEventListener('cookieyes-consent-update', onConsentUpdate);
+        window.addEventListener('cookieyes-consent-update', onConsentUpdate);
 
-        // Fallback for returning visitors: CookieYes may have already set the
-        // consent cookie before this listener was attached — check it directly.
+        // Fallback: read the consent cookie directly once the DOM is ready.
+        // Handles returning visitors where CookieYes fires before our listeners attach.
+        // Cookie format: "consentid:xxx,consent:yes,analytics:yes,..."
         document.addEventListener('DOMContentLoaded', function () {
-          var match = document.cookie.match(/(?:^|;\s*)cookieyes-analytics=([^;]*)/);
-          if (match && match[1] === 'yes') loadGA4();
+          var match = document.cookie.match(/(?:^|;\s*)cookieyes-consent=([^;]*)/);
+          if (match && decodeURIComponent(match[1]).includes('analytics:yes')) loadGA4();
         });
       }
     </script>
