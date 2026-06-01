@@ -75,29 +75,51 @@ const pageTitle = `${title} — ${siteConfig.authorFullName}`;
       src={`https://cdn-cookieyes.com/client_data/${siteConfig.cookieYesScriptId}/script.js`}
     ></script>
 
-    <!-- Consent defaults and conditional GTM injection -->
-    <script define:vars={{ gtmContainerId: siteConfig.gtmContainerId }}>
+    <!-- Consent defaults must run synchronously before any analytics load.
+         All consent defaults to denied — zero data collected before explicit
+         user consent, satisfying PIPEDA requirements for Canadian audiences. -->
+    <script define:vars={{ ga4MeasurementId: siteConfig.ga4MeasurementId }}>
       window.dataLayer = window.dataLayer || [];
       function gtag() { dataLayer.push(arguments); }
+
+      // Default everything denied — must run before gtag.js loads
       gtag('consent', 'default', {
-        analytics_storage: 'denied',
-        ad_storage: 'denied',
-        wait_for_update: 500,
+        analytics_storage:              'denied',
+        ad_storage:                     'denied',
+        ad_user_data:                   'denied',
+        ad_personalization:             'denied',
+        functionality_storage:          'denied',
+        personalization_storage:        'denied',
+        security_storage:               'granted', // always allowed (CSRF etc.)
+        wait_for_update:                500,
       });
 
       document.addEventListener('cookieyes-consent-update', function (event) {
         const detail = event.detail || {};
-        if (detail.analytics === 'yes') {
-          gtag('consent', 'update', { analytics_storage: 'granted' });
 
-          if (!document.getElementById('gtm-script')) {
+        if (detail.analytics === 'yes') {
+          // Upgrade consent before the script loads so GA4 captures this page view
+          gtag('consent', 'update', {
+            analytics_storage:       'granted',
+            functionality_storage:   'granted',
+            personalization_storage: 'granted',
+          });
+
+          // Dynamically inject gtag.js — only fires once per session
+          if (!document.getElementById('ga4-script')) {
             const s = document.createElement('script');
-            s.id = 'gtm-script';
+            s.id    = 'ga4-script';
             s.async = true;
-            s.src = `https://www.googletagmanager.com/gtm.js?id=${gtmContainerId}`;
+            s.src   = `https://www.googletagmanager.com/gtag/js?id=${ga4MeasurementId}`;
             document.head.appendChild(s);
 
-            dataLayer.push({ 'gtm.start': new Date().getTime(), event: 'gtm.js' });
+            // Configure GA4: disable ad signals, respect consent mode
+            gtag('js', new Date());
+            gtag('config', ga4MeasurementId, {
+              allow_google_signals:              false, // no remarketing / audience
+              allow_ad_personalization_signals:  false,
+              restricted_data_processing:        true,  // CCPA / PIPEDA safe mode
+            });
           }
         }
       });
@@ -129,17 +151,8 @@ const pageTitle = `${title} — ${siteConfig.authorFullName}`;
   </style>
   <body class="text-gray-900 font-sans antialiased overflow-x-hidden" style="background-color: #f8f5f0; background-image: radial-gradient(ellipse at 50% -5%, #e4ddd2 0%, #f8f5f0 60%);">
 
-    <!-- GTM noscript fallback — only meaningful after consent, kept here for spec compliance -->
-    <noscript>
-      <iframe
-        src={`https://www.googletagmanager.com/ns.html?id=${siteConfig.gtmContainerId}`}
-        height="0"
-        width="0"
-        style="display:none;visibility:hidden"
-      ></iframe>
-    </noscript>
 
-    {navOverHero ? (
+{navOverHero ? (
       <div class="relative">
         <div class="absolute top-0 left-0 right-0 z-60 pointer-events-none">
           <div class="pointer-events-auto">
@@ -171,19 +184,28 @@ const pageTitle = `${title} — ${siteConfig.authorFullName}`;
       </div>
     </footer>
 
-    <!-- External link + work blog click tracking -->
-    <script define:vars={{ workBlogUrl: siteConfig.workBlogUrl }}>
+    <!-- External link tracking — fires GA4 events for all outbound clicks.
+         cantilever_referral and newsletter_signup are marked as key events
+         in GA4 Admin → Events → Mark as key event. -->
+    <script define:vars={{ workBlogUrl: siteConfig.workBlogUrl, cantileverUrl: siteConfig.employerUrl }}>
       document.addEventListener('click', function (e) {
         const a = e.target.closest('a');
         if (!a) return;
         const href = a.getAttribute('href') || '';
         if (!href.startsWith('http') || href.startsWith(window.location.origin)) return;
-        const isWorkBlog = href.startsWith(workBlogUrl);
-        window.dataLayer = window.dataLayer || [];
-        window.dataLayer.push({
-          event: isWorkBlog ? 'work_blog_click' : 'external_link_click',
-          destination: href,
-        });
+
+        if (typeof gtag === 'undefined') return;
+
+        const isCantilever = href.startsWith(cantileverUrl);
+        const isWorkBlog   = href.startsWith(workBlogUrl);
+
+        if (isCantilever) {
+          gtag('event', 'cantilever_referral', { link_url: href });
+        } else if (isWorkBlog) {
+          gtag('event', 'work_blog_click', { link_url: href });
+        } else {
+          gtag('event', 'external_link_click', { link_url: href });
+        }
       });
     </script>
   </body>

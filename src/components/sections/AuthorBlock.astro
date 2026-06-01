@@ -233,3 +233,14 @@ const [before, after] = bio.split(employerName);
     }
   }
 </style>
+
+<script>
+  document.querySelector('.ab-form')?.addEventListener('submit', function () {
+    if (typeof gtag !== 'undefined') {
+      gtag('event', 'newsletter_signup', {
+        event_category: 'engagement',
+        event_label: 'buttondown',
+      });
+    }
+  });
+</script>

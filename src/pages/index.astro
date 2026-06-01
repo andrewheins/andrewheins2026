@@ -5,8 +5,6 @@ import IntroBlock from '../components/sections/IntroBlock.astro';
 import PillarCards from '../components/sections/PillarCards.astro';
 import LatestWriting from '../components/sections/LatestWriting.astro';
 import WorkBlock from '../components/sections/WorkBlock.astro';
-import ContactSection from '../components/sections/ContactSection.astro';
-import ContactForm from '../components/sections/ContactForm.astro';
 import { siteConfig } from '../site.config';
 
 const allPosts = await getCollection('writing');
@@ -72,12 +70,4 @@ const pillars = [
     pillars={pillars}
   />
 
-  <ContactSection
-    heading="Get in touch"
-    intro={`I'm reachable by email and on LinkedIn. If you have a question about digital strategy, want to discuss something I've written, or are interested in working with ${siteConfig.employerName}, I'd like to hear from it.`}
-    email={siteConfig.contactEmail}
-    linkedInUrl={siteConfig.linkedInUrl}
-  >
-    <ContactForm workerEndpoint={siteConfig.workerEndpoint} />
-  </ContactSection>
 </BaseLayout>

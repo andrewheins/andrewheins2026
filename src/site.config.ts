@@ -10,9 +10,9 @@ export const siteConfig = {
   workBlogAuthorProfileUrl: 'https://cantilever.co/team/andrew-heins',
   assetBaseUrl: 'https://assets.andrewheins.ca',
   siteBaseUrl: 'https://andrewheins.ca',
-  contactEmail: 'andrew.heins@gmail.com',
-  gtmContainerId: 'GTM-XXXXXXX',
-  cookieYesScriptId: 'PLACEHOLDER',
+  contactEmail: '',
+  ga4MeasurementId: 'G-6WZKFS71EW',
+  cookieYesScriptId: 'f8847f756445572b60545a2524b350a4',
   workerEndpoint: 'https://PLACEHOLDER.workers.dev/contact',
   ogImageDefault: 'https://assets.andrewheins.ca/images/og-default.jpg',
 } as const;
