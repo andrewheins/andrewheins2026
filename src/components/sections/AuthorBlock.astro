@@ -13,27 +13,223 @@ const { name, headshotUrl, bio, employerName, employerUrl } = Astro.props;
 const [before, after] = bio.split(employerName);
 ---
 
-<aside class="border-t border-gray-100 mt-16 pt-10 pb-16">
-  <div class="flex items-start gap-4">
-    <a href="/" class="flex-shrink-0 mt-1">
-      <img
-        src={headshotUrl}
-        alt={name}
-        class="w-14 h-14 rounded-full object-cover"
-      />
-    </a>
-    <div>
-      <a href="/" class="font-semibold text-gray-900 hover:text-gray-600 transition-colors">
-        {name}
+<aside class="ab-wrap">
+  <div class="ab-grid">
+
+    <!-- Author info -->
+    <div class="ab-author">
+      <a href="/" class="ab-headshot-link">
+        <img src={headshotUrl} alt={name} class="ab-headshot" />
       </a>
-      <p class="text-sm text-gray-600 leading-relaxed mt-1">
-        {before}<a
-          href={employerUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          class="underline underline-offset-2 hover:text-gray-900 transition-colors"
-        >{employerName}</a>{after}
-      </p>
+      <div>
+        <a href="/" class="ab-name">{name}</a>
+        <p class="ab-bio">
+          {before}<a
+            href={employerUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="ab-employer-link"
+          >{employerName}</a>{after}
+        </p>
+      </div>
     </div>
+
+    <!-- Subscribe form — index card styling -->
+    <div class="ab-card-wrap">
+      <div class="ab-card">
+        <p class="ab-card-heading">Get new essays —</p>
+        <form
+          action="https://buttondown.com/api/emails/embed-subscribe/andrewheins"
+          method="post"
+          class="ab-form"
+        >
+          <div class="ab-field">
+            <label for="bd-email" class="ab-field-label">your email...</label>
+            <input type="email" name="email" id="bd-email" class="ab-input" required />
+          </div>
+          <button type="submit" class="ab-submit">Subscribe →</button>
+          <p class="ab-powered">
+            <a href="https://buttondown.com/refer/andrewheins" target="_blank" rel="noopener noreferrer">
+              Powered by Buttondown
+            </a>
+          </p>
+        </form>
+      </div>
+    </div>
+
   </div>
 </aside>
+
+<style>
+  .ab-wrap {
+    margin-top: 4rem;
+    padding-bottom: 4rem;
+  }
+
+  .ab-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3rem;
+    align-items: center;
+  }
+
+  /* === Author === */
+  .ab-author {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .ab-headshot-link {
+    flex-shrink: 0;
+    margin-top: 0.15rem;
+  }
+
+  .ab-headshot {
+    width: 3.5rem;
+    height: 3.5rem;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+
+  .ab-name {
+    display: block;
+    font-weight: 600;
+    color: #1c180e;
+    text-decoration: none;
+    margin-bottom: 0.25rem;
+  }
+
+  .ab-name:hover { color: #4a4035; }
+
+  .ab-bio {
+    font-size: 0.875rem;
+    color: #4a4035;
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  .ab-employer-link {
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    color: inherit;
+  }
+
+  .ab-employer-link:hover { color: #1c180e; }
+
+  /* === Subscribe card === */
+  .ab-card-wrap {
+    transform: rotate(1.2deg);
+  }
+
+  .ab-card {
+    position: relative;
+    background-color: #f5f3e8;
+    padding: 1.75rem 1.5rem 2.5rem;
+    box-shadow:
+      0 4px 14px rgba(0, 0, 0, 0.18),
+      0 1px 3px rgba(0, 0, 0, 0.10);
+  }
+
+  /* Tape strip at top */
+  .ab-card::before {
+    content: '';
+    position: absolute;
+    top: -0.85rem;
+    left: 50%;
+    transform: translateX(-50%) rotate(-1.5deg);
+    width: 4.5rem;
+    height: 1.6rem;
+    background: linear-gradient(
+      to bottom,
+      rgba(230, 218, 185, 0.30) 0%,
+      rgba(218, 205, 168, 0.52) 35%,
+      rgba(218, 205, 168, 0.52) 65%,
+      rgba(230, 218, 185, 0.30) 100%
+    );
+    border-left:  0.5px solid rgba(190, 178, 145, 0.35);
+    border-right: 0.5px solid rgba(190, 178, 145, 0.35);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.07);
+  }
+
+  .ab-card-heading {
+    font-family: 'Rock Salt', cursive;
+    font-size: 0.8rem;
+    color: #2a1f0e;
+    margin: 0 0 1.25rem;
+    line-height: 1.4;
+  }
+
+  .ab-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .ab-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .ab-field-label {
+    font-family: 'Rock Salt', cursive;
+    font-size: 0.65rem;
+    color: #8a7a60;
+  }
+
+  .ab-input {
+    width: 100%;
+    font-size: 0.875rem;
+    color: #1c180e;
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid rgba(100, 85, 60, 0.35);
+    padding: 0.35rem 0;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+
+  .ab-input:focus { border-bottom-color: #1c180e; }
+
+  .ab-submit {
+    align-self: flex-end;
+    font-family: 'Rock Salt', cursive;
+    font-size: 0.65rem;
+    color: #2a1f0e;
+    background: transparent;
+    border: 1.5px solid #2a1f0e;
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+    margin-top: 0.5rem;
+  }
+
+  .ab-submit:hover {
+    background: #2a1f0e;
+    color: #f5f3e8;
+  }
+
+  .ab-powered {
+    font-size: 0.6rem;
+    color: #b0a898;
+    margin: 0;
+    text-align: right;
+  }
+
+  .ab-powered a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .ab-powered a:hover { color: #6b5e45; }
+
+
+  /* Mobile: stack */
+  @media (max-width: 640px) {
+    .ab-grid {
+      grid-template-columns: 1fr;
+      gap: 2rem;
+    }
+  }
+</style>

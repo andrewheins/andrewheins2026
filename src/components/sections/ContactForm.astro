@@ -2,78 +2,313 @@
 interface Props {
   workerEndpoint: string;
 }
-
 const { workerEndpoint } = Astro.props;
 ---
 
-<form id="contact-form" novalidate class="mt-8 space-y-6 max-w-lg">
-  <div id="form-fields" class="space-y-5">
-    <div>
-      <label for="cf-name" class="block text-sm font-medium text-gray-700 mb-1">Name</label>
-      <input
-        id="cf-name"
-        name="name"
-        type="text"
-        required
-        autocomplete="name"
-        class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-400"
-      />
-    </div>
+<div class="form-sheet" id="form-sheet">
 
-    <div>
-      <label for="cf-email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
-      <input
-        id="cf-email"
-        name="email"
-        type="email"
-        required
-        autocomplete="email"
-        class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-400"
-      />
-    </div>
+  <!-- RECEIVED stamp overlay — appears on successful submit -->
+  <div class="received-overlay hidden" id="form-success" role="status" aria-live="polite">
+    <div class="received-mark" id="received-mark">RECEIVED</div>
+    <p class="received-note">I'll get back to you soon.</p>
+  </div>
 
-    <div>
-      <label for="cf-message" class="block text-sm font-medium text-gray-700 mb-1">Message</label>
-      <textarea
-        id="cf-message"
-        name="message"
-        required
-        rows="5"
-        class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-400 resize-y"
-      ></textarea>
-    </div>
+  <!-- Form 26-C header -->
+  <div class="form-header">
+    <span class="form-title">FORM 26-C &middot; CORRESPONDENCE &middot; PLEASE PRINT CLEARLY</span>
+    <span class="form-no">No. 2026-001</span>
+  </div>
 
-    <button
-      id="cf-submit"
-      type="submit"
-      disabled
-      class="px-5 py-2 bg-gray-900 text-white text-sm font-medium rounded-md transition-opacity disabled:opacity-40 disabled:cursor-not-allowed hover:enabled:bg-gray-700"
-    >
-      Send message
-    </button>
+  <form id="contact-form" class="form-body" novalidate>
+    <div id="form-fields">
 
-    <p id="cf-consent-note" class="text-xs text-gray-600">
-      The send button will enable once you accept cookies. I use them only for analytics.
+      <div class="field">
+        <label for="cf-name">Name</label>
+        <input
+          id="cf-name"
+          name="name"
+          type="text"
+          required
+          autocomplete="name"
+          placeholder="your name"
+        />
+      </div>
+
+      <div class="field">
+        <label for="cf-email">Return address &mdash; Email</label>
+        <input
+          id="cf-email"
+          name="email"
+          type="email"
+          required
+          autocomplete="email"
+          placeholder="where to reach you"
+        />
+      </div>
+
+      <div class="field field--message">
+        <label for="cf-message">Message</label>
+        <div class="msg-wrap">
+          <textarea
+            id="cf-message"
+            name="message"
+            required
+            rows="5"
+            placeholder="what's on your mind…"
+          ></textarea>
+        </div>
+      </div>
+
+      <div class="form-footer-row">
+        <p id="cf-consent-note" class="consent-note">
+          Send button enables once you accept cookies.
+        </p>
+        <button
+          id="cf-submit"
+          type="submit"
+          disabled
+          class="stamp-btn"
+          aria-label="Send message"
+        >
+          MAIL IT IN
+        </button>
+      </div>
+
+    </div><!-- #form-fields -->
+
+    <p id="form-error" class="form-error hidden">
+      Something went wrong &mdash; try emailing directly.
     </p>
-  </div>
+  </form>
 
-  <div id="form-success" class="hidden py-4">
-    <p class="text-gray-700">Message sent. I'll get back to you soon.</p>
-  </div>
+</div><!-- .form-sheet -->
 
-  <div id="form-error" class="hidden py-4">
-    <p class="text-red-600 text-sm">Something went wrong. Try emailing directly.</p>
-  </div>
-</form>
+<style>
+  /* ---- Sheet ---- */
+  .form-sheet {
+    margin-top: 2.2rem;
+    max-width: 600px;
+    background: #faf7ef;
+    background-image:
+      repeating-linear-gradient(90deg, rgba(255,255,255,.38) 0 1px, transparent 1px 4px),
+      repeating-linear-gradient(0deg, rgba(0,0,0,.012) 0 1px, transparent 1px 5px);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,0.7),
+      0 22px 56px -32px rgba(30,20,5,.6),
+      0 4px 16px -8px rgba(30,20,5,.2);
+    padding: 2.2rem 2.5rem 2.6rem;
+    transform: rotate(-0.4deg);
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* ---- Header ---- */
+  .form-header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.8rem;
+    padding-bottom: 0.65rem;
+    margin-bottom: 1.9rem;
+    border-bottom: 2px solid #1c180e;
+  }
+  .form-title {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.67rem;
+    letter-spacing: 0.09em;
+    color: #4a4232;
+  }
+  .form-no {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.06em;
+    color: #7a6f52;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  /* ---- Body dims on success ---- */
+  .form-body { transition: opacity 0.4s ease, filter 0.4s ease; }
+  .form-sheet.done .form-body {
+    opacity: 0.25;
+    filter: blur(0.7px);
+    pointer-events: none;
+    user-select: none;
+  }
+
+  /* ---- Fields ---- */
+  .field { margin-bottom: 1.75rem; }
+  .field > label {
+    display: block;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #7a6f52;
+    margin-bottom: 0.42rem;
+  }
+  .field input {
+    width: 100%;
+    border: none;
+    border-bottom: 1.5px solid #9a9080;
+    background: transparent;
+    outline: none;
+    font-family: 'DM Sans', system-ui, sans-serif;
+    font-size: 1rem;
+    color: #1c180e;
+    padding: 0.35rem 0.2rem 0.3rem;
+    transition: border-bottom-color 0.15s;
+  }
+  .field input:focus { border-bottom-color: #1c180e; }
+  .field input::placeholder { color: rgba(28,24,14,0.22); font-style: italic; }
+
+  /* ---- Message — ruled paper ---- */
+  .field--message .msg-wrap {
+    border-bottom: 1.5px solid #9a9080;
+    background-image: repeating-linear-gradient(
+      transparent 0px, transparent 27px,
+      rgba(154,144,128,.26) 27px, rgba(154,144,128,.26) 28px
+    );
+  }
+  .field--message textarea {
+    display: block;
+    width: 100%;
+    background: transparent;
+    border: none;
+    outline: none;
+    resize: none;
+    font-family: 'DM Sans', system-ui, sans-serif;
+    font-size: 1rem;
+    color: #1c180e;
+    line-height: 28px;
+    padding: 4px 0.2rem 0;
+  }
+  .field--message textarea::placeholder { color: rgba(28,24,14,.22); font-style: italic; }
+
+  /* ---- Footer row ---- */
+  .form-footer-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1.2rem;
+    margin-top: 2rem;
+    padding-top: 1.4rem;
+    border-top: 1px solid #d8d2c4;
+  }
+
+  /* ---- Consent note ---- */
+  .consent-note {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.63rem;
+    letter-spacing: 0.02em;
+    color: #7a6f52;
+    line-height: 1.55;
+    margin: 0;
+    max-width: 22rem;
+  }
+
+  /* ---- Stamp submit ---- */
+  .stamp-btn {
+    font-family: 'Rock Salt', cursive;
+    font-size: 0.78rem;
+    letter-spacing: 0.03em;
+    color: #6b2525;
+    background: transparent;
+    border: 2.5px solid #6b2525;
+    padding: 0.88rem 2rem;
+    cursor: pointer;
+    position: relative;
+    transform: rotate(-2.5deg);
+    transition: opacity 0.3s ease, transform 0.12s ease, box-shadow 0.12s ease;
+  }
+  .stamp-btn::before {
+    content: '';
+    position: absolute;
+    inset: 4px;
+    border: 1px dashed rgba(107,37,37,.42);
+    pointer-events: none;
+  }
+  .stamp-btn:disabled { opacity: 0.28; cursor: not-allowed; }
+  .stamp-btn:hover:not(:disabled) {
+    transform: rotate(-2.5deg) translateY(-3px);
+    box-shadow: 2px 7px 0 rgba(107,37,37,.18);
+  }
+  .stamp-btn:active:not(:disabled) {
+    transform: rotate(-2.5deg) translateY(1px) scale(0.97);
+    box-shadow: none;
+  }
+
+  /* ---- RECEIVED overlay ---- */
+  .received-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1.2rem;
+    background: rgba(250,247,239,.7);
+  }
+  .received-overlay.hidden { display: none; }
+
+  .received-mark {
+    font-family: 'Rock Salt', cursive;
+    font-size: 2.55rem;
+    line-height: 1;
+    color: rgba(107,37,37,.8);
+    border: 5px solid rgba(107,37,37,.72);
+    padding: 0.55rem 1.3rem;
+    transform: rotate(-15deg);
+    letter-spacing: 0.04em;
+    filter: blur(0.35px);
+    box-shadow: inset 0 0 0 2px rgba(107,37,37,.14);
+    will-change: transform, opacity;
+  }
+  .received-mark.animate {
+    animation: cfStampIn 0.55s cubic-bezier(.2,.8,.3,1) forwards;
+  }
+  @keyframes cfStampIn {
+    0%   { transform: rotate(-15deg) translateY(-50px) scale(1.55); opacity: 0; }
+    52%  { transform: rotate(-15deg) translateY(7px) scale(0.93); opacity: 0.82; }
+    70%  { transform: rotate(-15deg) translateY(-3px) scale(1.02); }
+    100% { transform: rotate(-15deg) scale(1); opacity: 0.8; }
+  }
+  .received-note {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.82rem;
+    color: #4a4232;
+    margin: 0;
+    letter-spacing: 0.03em;
+  }
+
+  /* ---- Error ---- */
+  .form-error {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.75rem;
+    color: #8a2020;
+    margin: 1rem 0 0;
+  }
+  .form-error.hidden { display: none; }
+
+  /* ---- Mobile ---- */
+  @media (max-width: 600px) {
+    .form-sheet { transform: none; padding: 1.6rem 1.4rem 2rem; }
+    .form-footer-row { flex-direction: column; align-items: flex-start; }
+    .stamp-btn { transform: none; }
+    .stamp-btn:hover:not(:disabled) { transform: translateY(-2px); }
+  }
+</style>
 
 <script define:vars={{ workerEndpoint }}>
-  const UTM_KEY = 'utm_params';
+  const UTM_KEY   = 'utm_params';
   const UTM_NAMES = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term'];
 
-  // First-touch UTM capture — never overwrite existing session value
+  /* ---- First-touch UTM capture ---- */
   (function captureUtms() {
     if (sessionStorage.getItem(UTM_KEY)) return;
-    const params = new URLSearchParams(window.location.search);
+    const params   = new URLSearchParams(window.location.search);
     const captured = {};
     UTM_NAMES.forEach(function (k) {
       const v = params.get(k);
@@ -84,8 +319,8 @@ const { workerEndpoint } = Astro.props;
     }
   })();
 
-  // Consent gate
-  const submitBtn = /** @type {HTMLButtonElement|null} */ (document.getElementById('cf-submit'));
+  /* ---- CookieYes consent gate ---- */
+  const submitBtn   = /** @type {HTMLButtonElement|null} */ (document.getElementById('cf-submit'));
   const consentNote = document.getElementById('cf-consent-note');
 
   function hasAnalyticsConsent() {
@@ -96,63 +331,74 @@ const { workerEndpoint } = Astro.props;
   }
 
   function enableSubmit() {
-    if (submitBtn) submitBtn.disabled = false;
+    if (submitBtn)   submitBtn.disabled = false;
     if (consentNote) consentNote.style.display = 'none';
   }
 
-  if (hasAnalyticsConsent()) {
-    enableSubmit();
-  }
+  if (hasAnalyticsConsent()) enableSubmit();
 
   document.addEventListener('cookieyes-consent-update', function (event) {
-    if (event.detail && event.detail.analytics === 'yes') {
-      enableSubmit();
-    }
+    if (event.detail && event.detail.analytics === 'yes') enableSubmit();
   });
 
-  // Form submission
-  const form = document.getElementById('contact-form');
-  const formFields = document.getElementById('form-fields');
-  const successEl = document.getElementById('form-success');
-  const errorEl = document.getElementById('form-error');
+  /* ---- Form submission ---- */
+  const form       = document.getElementById('contact-form');
+  const formSheet  = document.getElementById('form-sheet');
+  const successEl  = document.getElementById('form-success');
+  const recvMark   = document.getElementById('received-mark');
+  const errorEl    = document.getElementById('form-error');
 
   form && form.addEventListener('submit', async function (e) {
     e.preventDefault();
 
-    const nameEl = /** @type {HTMLInputElement} */ (document.getElementById('cf-name'));
-    const emailEl = /** @type {HTMLInputElement} */ (document.getElementById('cf-email'));
+    const nameEl    = /** @type {HTMLInputElement}  */ (document.getElementById('cf-name'));
+    const emailEl   = /** @type {HTMLInputElement}  */ (document.getElementById('cf-email'));
     const messageEl = /** @type {HTMLTextAreaElement} */ (document.getElementById('cf-message'));
 
     const payload = {
-      name: nameEl.value.trim(),
-      email: emailEl.value.trim(),
+      name:    nameEl.value.trim(),
+      email:   emailEl.value.trim(),
       message: messageEl.value.trim(),
     };
 
-    // Append UTMs from first-touch session storage
+    /* Append first-touch UTMs */
     const utms = JSON.parse(sessionStorage.getItem(UTM_KEY) || '{}');
     Object.assign(payload, utms);
 
+    if (submitBtn) {
+      submitBtn.disabled    = true;
+      submitBtn.textContent = 'SENDING\u2026';
+    }
+    if (errorEl) errorEl.classList.add('hidden');
+
     try {
-      const res = await fetch(workerEndpoint, {
-        method: 'POST',
+      const res  = await fetch(workerEndpoint, {
+        method:  'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
+        body:    JSON.stringify(payload),
       });
       const data = await res.json();
 
       if (data.success) {
-        if (formFields) formFields.classList.add('hidden');
+        /* Show RECEIVED stamp */
+        if (formSheet) formSheet.classList.add('done');
         if (successEl) successEl.classList.remove('hidden');
+        requestAnimationFrame(function () {
+          requestAnimationFrame(function () {
+            if (recvMark) recvMark.classList.add('animate');
+          });
+        });
         window.dataLayer = window.dataLayer || [];
         window.dataLayer.push({ event: 'contact_form_submit' });
       } else {
-        if (errorEl) errorEl.classList.remove('hidden');
+        if (errorEl)   errorEl.classList.remove('hidden');
+        if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = 'MAIL IT IN'; }
         window.dataLayer = window.dataLayer || [];
         window.dataLayer.push({ event: 'contact_form_error', error: data.error });
       }
     } catch (_err) {
-      if (errorEl) errorEl.classList.remove('hidden');
+      if (errorEl)   errorEl.classList.remove('hidden');
+      if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = 'MAIL IT IN'; }
       window.dataLayer = window.dataLayer || [];
       window.dataLayer.push({ event: 'contact_form_error', error: 'network_error' });
     }

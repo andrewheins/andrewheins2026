@@ -1,31 +1,180 @@
 ---
 interface Props {
+  title?: string;
   body: string;
+  photo?: string;
+  photoAlt?: string;
   decorLeft?: string;
   decorRight?: string;
 }
 
-const { body, decorLeft, decorRight } = Astro.props;
+const { title, body, photo, photoAlt = '', decorLeft, decorRight } = Astro.props;
+
+// Dual torn-paper clip-path: top edge from EPS Shape 1 (left→right),
+// bottom edge from EPS Shape 2 (right→left). Both edges use calc(Npx) offsets
+// so the cut depth scales independently of element height.
+const tornClipPath = "polygon(" +
+  // TOP TORN EDGE — Shape 1 from EPS, traversed left → right
+  "0.000% calc(0% + 29.93px), 1.382% calc(0% + 29.38px), 2.183% calc(0% + 30.57px), 3.327% calc(0% + 31.07px), 4.490% calc(0% + 30.69px), 5.703% calc(0% + 31.88px), 6.548% calc(0% + 37.08px), 7.398% calc(0% + 39.91px), 8.712% calc(0% + 40.99px), 10.080% calc(0% + 41.97px), 11.378% calc(0% + 40.25px), 12.668% calc(0% + 37.25px), 14.028% calc(0% + 35.43px), 15.200% calc(0% + 34.47px), 16.368% calc(0% + 33.26px), 17.418% calc(0% + 31.39px), 18.462% calc(0% + 29.64px), 19.688% calc(0% + 29.14px), 20.925% calc(0% + 29.41px), 22.088% calc(0% + 29.06px), 23.237% calc(0% + 29.35px), 24.263% calc(0% + 31.73px), 25.297% calc(0% + 34.26px), 27.800% calc(0% + 34.05px), 30.302% calc(0% + 31.91px), 31.407% calc(0% + 32.28px), 32.493% calc(0% + 32.02px), 33.335% calc(0% + 30.65px), 35.800% calc(0% + 31.06px), 38.257% calc(0% + 31.96px), 39.725% calc(0% + 29.38px), 41.663% calc(0% + 29.70px), 43.595% calc(0% + 31.01px), 46.540% calc(0% + 32.84px), 49.550% calc(0% + 33.78px), 52.513% calc(0% + 32.96px), 54.775% calc(0% + 31.35px), 57.025% calc(0% + 29.25px), 58.957% calc(0% + 28.16px), 60.888% calc(0% + 28.14px), 61.937% calc(0% + 27.82px), 62.947% calc(0% + 28.08px), 63.703% calc(0% + 30.72px), 64.730% calc(0% + 32.25px), 65.053% calc(0% + 33.33px), 66.833% calc(0% + 32.34px), 68.440% calc(0% + 30.51px), 70.063% calc(0% + 29.32px), 71.383% calc(0% + 28.88px), 72.692% calc(0% + 28.08px), 73.893% calc(0% + 28.27px), 75.087% calc(0% + 29.25px), 76.197% calc(0% + 29.98px), 77.305% calc(0% + 30.65px), 78.990% calc(0% + 32.50px), 80.677% calc(0% + 34.29px), 83.178% calc(0% + 34.73px), 85.685% calc(0% + 34.50px), 87.050% calc(0% + 34.56px), 88.377% calc(0% + 33.26px), 90.360% calc(0% + 31.04px), 92.373% calc(0% + 29.95px), 94.657% calc(0% + 27.32px), 96.958% calc(0% + 24.39px), 99.257% calc(0% + 23.04px), 100.000% calc(0% + 22.00px)," +
+  // BOTTOM TORN EDGE — Shape 2 from EPS, traversed right → left
+  "100.000% calc(100% - 34.68px), 99.967% calc(100% - 34.71px), 98.235% calc(100% - 34.85px), 96.515% calc(100% - 35.80px), 94.560% calc(100% - 37.65px), 92.578% calc(100% - 38.44px), 91.237% calc(100% - 39.02px), 89.907% calc(100% - 39.73px), 88.648% calc(100% - 42.16px), 86.623% calc(100% - 48.13px), 84.507% calc(100% - 52.70px), 82.358% calc(100% - 55.74px), 80.188% calc(100% - 58.38px), 78.713% calc(100% - 59.96px), 77.230% calc(100% - 61.34px), 75.695% calc(100% - 63.16px), 74.172% calc(100% - 65.17px), 72.952% calc(100% - 66.05px), 71.780% calc(100% - 64.22px), 70.965% calc(100% - 59.20px), 70.257% calc(100% - 53.49px), 69.488% calc(100% - 48.66px), 68.707% calc(100% - 43.97px), 67.867% calc(100% - 40.88px), 66.885% calc(100% - 42.24px), 65.340% calc(100% - 41.51px), 63.827% calc(100% - 39.23px), 62.413% calc(100% - 37.41px), 61.057% calc(100% - 34.46px), 60.005% calc(100% - 30.78px), 58.975% calc(100% - 26.87px), 58.025% calc(100% - 23.55px), 56.982% calc(100% - 22.25px), 54.737% calc(100% - 22.28px), 52.488% calc(100% - 22.25px), 50.265% calc(100% - 22.76px), 48.045% calc(100% - 23.46px), 46.210% calc(100% - 24.73px), 44.370% calc(100% - 25.95px), 42.548% calc(100% - 27.32px), 40.765% calc(100% - 29.62px), 39.815% calc(100% - 29.73px), 38.572% calc(100% - 29.94px), 37.323% calc(100% - 30.63px), 34.883% calc(100% - 32.16px), 32.427% calc(100% - 33.16px), 29.972% calc(100% - 33.48px), 27.748% calc(100% - 33.43px), 25.525% calc(100% - 33.50px), 24.135% calc(100% - 32.90px), 22.748% calc(100% - 32.15px), 21.528% calc(100% - 32.03px), 20.313% calc(100% - 31.60px), 17.858% calc(100% - 30.87px), 15.450% calc(100% - 28.48px), 12.928% calc(100% - 24.66px), 10.343% calc(100% - 23.50px), 8.155% calc(100% - 23.68px), 5.985% calc(100% - 25.08px), 4.013% calc(100% - 27.17px), 2.032% calc(100% - 28.54px), 0.628% calc(100% - 28.75px), 0.000% calc(100% - 30.89px)" +
+")";
 ---
 
-<div class="intro-outer">
-  {decorLeft && (
-    <img src={decorLeft} alt="" aria-hidden="true" class="intro-decor intro-decor-left" />
+<!-- intro-frame provides the positioning context for the overflowing photo -->
+<div class="intro-frame">
+  <!-- intro-shadow-wrap carries the drop-shadow so it casts onto content below the torn edge -->
+  <div class="intro-shadow-wrap">
+    <!-- Inner div gets the clip-path; filter on a parent sees the clipped shape -->
+    <div class="intro-outer" style={`clip-path: ${tornClipPath};`}>
+      {decorLeft && (
+        <img src={decorLeft} alt="" aria-hidden="true" class="intro-decor intro-decor-left" />
+      )}
+      {decorRight && (
+        <img src={decorRight} alt="" aria-hidden="true" class="intro-decor intro-decor-right" />
+      )}
+      <section class="intro-section">
+        <div class="intro-text">
+          {title && <h1 class="intro-title">{title}</h1>}
+          <p class="intro-body">{body}</p>
+        </div>
+      </section>
+    </div>
+  </div>
+  <!-- Photo lives outside the clip-path so it can bleed past the torn edges -->
+  {photo && (
+    <div class="intro-photo-outer">
+      <div class="intro-photo-wrap">
+        <img src={photo} alt={photoAlt} class="intro-photo-img" />
+        <span class="intro-photo-caption">1990</span>
+      </div>
+    </div>
   )}
-  {decorRight && (
-    <img src={decorRight} alt="" aria-hidden="true" class="intro-decor intro-decor-right" />
-  )}
-  <section class="max-w-3xl mx-auto px-6 py-16">
-    <p class="text-gray-700 text-lg leading-relaxed">{body}</p>
-  </section>
 </div>
 
 <style>
+  .intro-shadow-wrap {
+    filter:
+      drop-shadow(0 -3px 5px rgba(0, 0, 0, 0.35))
+      drop-shadow(0 3px 5px rgba(0, 0, 0, 0.40));
+  }
+
   .intro-outer {
     position: relative;
     overflow-x: clip;
+    background-color: #6b3fa0;
+    background-image:
+      repeating-linear-gradient(
+        92deg,
+        transparent,
+        transparent 2px,
+        rgba(255,255,255,0.03) 2px,
+        rgba(255,255,255,0.03) 4px
+      ),
+      repeating-linear-gradient(
+        180deg,
+        transparent,
+        transparent 3px,
+        rgba(0,0,0,0.04) 3px,
+        rgba(0,0,0,0.04) 6px
+      );
   }
 
+  /* === Outer frame — positioning context for the overflowing photo === */
+  .intro-frame {
+    position: relative;
+  }
+
+  /* === Section container — wider than the max-w-3xl content below === */
+  .intro-section {
+    max-width: 64rem;
+    margin: 0 auto;
+    /* Right padding reserves space for the absolutely-positioned photo */
+    padding: 5.6rem calc(17.5rem + 4rem) 5rem 1.5rem;
+  }
+
+  .intro-text {
+    min-width: 0;
+  }
+
+  /* === Title === */
+  .intro-title {
+    font-family: 'Rock Salt', cursive;
+    font-size: clamp(1.4rem, 2.2vw, 2.2rem);
+    line-height: 1.2;
+    color: #f0e6ff;
+    margin: 0 0 1.25rem;
+  }
+
+  .intro-body {
+    font-size: 1.05rem;
+    line-height: 1.75;
+    color: #d8c4f0;
+    margin: 0;
+  }
+
+  /* === Taped photo — outside clip-path, vertically centred on the hero === */
+  .intro-photo-outer {
+    position: absolute;
+    /* Align right edge to content area right edge */
+    right: max(1.5rem, calc((100% - 64rem) / 2 + 1.5rem));
+    top: 50%;
+    transform: translateY(-50%);
+  }
+
+  .intro-photo-wrap {
+    position: relative;
+    display: inline-block;
+    transform: rotate(3.5deg);
+    filter: drop-shadow(2px 4px 10px rgba(0, 0, 0, 0.45));
+  }
+
+  /* Tape strip */
+  .intro-photo-wrap::before {
+    content: '';
+    position: absolute;
+    top: -1rem;
+    left: 50%;
+    transform: translateX(-50%) rotate(-1.5deg);
+    width: 4rem;
+    height: 1.5rem;
+    background: rgba(255, 240, 170, 0.55);
+    border: 1px solid rgba(220, 195, 100, 0.5);
+    z-index: 2;
+    /* subtle tape texture lines */
+    background-image: repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 3px,
+      rgba(255,255,255,0.08) 3px,
+      rgba(255,255,255,0.08) 4px
+    );
+  }
+
+  .intro-photo-caption {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Rock Salt', cursive;
+    font-size: 0.6rem;
+    color: #555;
+  }
+
+  .intro-photo-img {
+    display: block;
+    width: 17.5rem;
+    height: 17.5rem;
+    object-fit: cover;
+    border: 5px solid #fff;
+    border-bottom-width: 2rem;
+  }
+
+  /* === Decor images (existing) === */
   .intro-decor {
     position: absolute;
     display: block;
@@ -36,8 +185,6 @@ const { body, decorLeft, decorRight } = Astro.props;
   .intro-decor-left {
     width: 30rem;
     top: calc(-1rem - 100px);
-    /* right edge of disc = left + 30rem; anchoring it to section-left (50% - 24rem)
-       means left = 50% - 24rem - 30rem. Extra -2rem adds a small gap. */
     left: calc(50% - 24rem - 30rem - 2rem);
     transform: rotate(-12deg);
   }
@@ -52,6 +199,26 @@ const { body, decorLeft, decorRight } = Astro.props;
   @media (max-width: 640px) {
     .intro-decor {
       display: none;
+    }
+
+    .intro-section {
+      padding: 6rem 1.5rem 4rem;
+    }
+
+    .intro-photo-outer {
+      position: static;
+      transform: none;
+      display: flex;
+      justify-content: flex-end;
+      padding: 0 1.5rem 2rem;
+    }
+
+    .intro-photo-wrap {
+      transform: rotate(3.5deg);
+    }
+
+    .intro-photo-img {
+      width: 9rem;
     }
   }
 </style>

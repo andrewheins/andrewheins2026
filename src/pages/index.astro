@@ -1,12 +1,25 @@
 ---
+import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
-import VideoEntrance from '../components/sections/VideoEntrance.astro';
 import IntroBlock from '../components/sections/IntroBlock.astro';
 import PillarCards from '../components/sections/PillarCards.astro';
+import LatestWriting from '../components/sections/LatestWriting.astro';
 import WorkBlock from '../components/sections/WorkBlock.astro';
 import ContactSection from '../components/sections/ContactSection.astro';
 import ContactForm from '../components/sections/ContactForm.astro';
 import { siteConfig } from '../site.config';
+
+const allPosts = await getCollection('writing');
+allPosts.sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+const latestPosts = allPosts.slice(0, 3).map((entry) => ({
+  title: entry.data.title,
+  date: entry.data.date,
+  annotation: entry.data.annotation,
+  type: entry.data.type,
+  url: entry.data.type === 'curated'
+    ? (entry.data.externalUrl ?? '#')
+    : `/writing/${entry.slug}/`,
+}));
 
 const pillars = [
   {
@@ -30,25 +43,19 @@ const pillars = [
   description={`${siteConfig.authorFullName} is President of ${siteConfig.employerName}.`}
   canonicalUrl={Astro.url.href}
   navTheme="dark"
+  navOverHero={true}
 >
 
-  <VideoEntrance
-    video_desktop="https://assets.andrewheins.ca/video/rain-desktop.mp4"
-    video_mobile="https://assets.andrewheins.ca/video/rain-mobile.mp4"
-    title={`${siteConfig.authorFullName}`}
-    subtitle={`President at ${siteConfig.employerName}, a digital agency. I've been on the internet since MUDs and Geocities, and I'm still trying to figure out what we built. I still think we can deliver on the promise we saw in it as kids.`}
-  />
-
   <IntroBlock
+    title={siteConfig.authorFullName}
     body="When I was a kid, the Internet was going to change everything. It has - just not in the ways we were hoping. Twenty years in, I'm reckoning with the decisions we made, and the culture we built. Can we still deliver on the promise? Welcome to my website. Don't forget to sign the guestbook."
-    decorLeft={`${siteConfig.assetBaseUrl}/images/sympatico-disc.png`}
-    decorRight={`${siteConfig.assetBaseUrl}/images/icq-logo-sticker.png`}
+    photo={`${siteConfig.assetBaseUrl}/images/andrew-kid-computer.jpg`}
+    photoAlt="Andrew as a kid with a computer"
   />
 
-  <PillarCards
-    title="How I Think"
-    intro="A few principles have shaped how I think about this work. They're not a framework I invented — they're patterns I kept running into until I started taking them seriously."
-    pillars={pillars}
+  <LatestWriting
+    posts={latestPosts}
+    blurb="In a world where opinions are inescapable noise, I try to limit by writing to things worth reading."
   />
 
   <WorkBlock
@@ -57,6 +64,12 @@ const pillars = [
     ctaLinkText="we'd like to talk"
     ctaUrl={`${siteConfig.employerUrl}?utm_source=andrewheins.ca&utm_medium=personal_site&utm_campaign=work_section`}
     stickerUrl={`${siteConfig.assetBaseUrl}/images/cantilever-sticker.png`}
+    splotchUrl={`${siteConfig.assetBaseUrl}/images/splotch-light-cropped.png`}
+  />
+
+  <PillarCards
+    title="How I Think"
+    pillars={pillars}
   />
 
   <ContactSection

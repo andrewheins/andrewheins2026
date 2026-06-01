@@ -32,86 +32,100 @@ const hasVideo = !!(video_desktop || video_mobile);
 const shouldLoop = freeze_at === undefined;
 ---
 
-<!-- Spacer: VideoEntrance is position:fixed so it contributes no height to document flow.
-     This div reserves 100vh so the content below starts after the video. -->
-<div aria-hidden="true" style="height: 100vh"></div>
+<!--
+  Outer wrapper: no overflow restriction so the inner div's drop-shadow
+  can escape downward onto page content, creating a raised-paper effect.
+  The inner div uses clip-path to cut a torn-paper bottom edge; filter:drop-shadow
+  on the same element follows the clipped contour rather than the bounding box.
+-->
+<div id="video-entrance" class="relative w-full h-screen z-50"
+  style={!hasVideo ? "filter: drop-shadow(0 3px 5px rgba(0,0,0,0.40));" : undefined}
+>
 
-<div id="video-entrance" class="fixed inset-0 z-50 bg-black overflow-hidden">
-  <!-- Poster: converted to WebP at build time via Astro Image (1280px, q65).
-       id is preserved so JS focus/freeze logic still works. -->
-  {poster_desktop && (
-    <Image
-      id="video-poster"
-      src={poster_desktop}
-      alt=""
-      aria-hidden="true"
-      loading="eager"
-      fetchpriority="high"
-      width={1280}
-      height={720}
-      quality={65}
-      format="webp"
-      class="absolute inset-0 w-full h-full object-cover"
-      style={`object-position: ${focus_desktop}`}
-    />
-  )}
-
-  {hasVideo && (
-    <video
-      id="entrance-video"
-      class="absolute inset-0 w-full h-full object-cover z-10"
-      autoplay
-      muted
-      playsinline
-      {...shouldLoop ? { loop: true } : {}}
-    >
-      {video_desktop && (
-        <source src={video_desktop} media="(min-width: 768px)" type="video/mp4" />
-      )}
-      {video_mobile && (
-        <source src={video_mobile} type="video/mp4" />
-      )}
-    </video>
-  )}
-
-  <!-- Title overlay — fades in at title_appears_at, or immediately if no video -->
-  <div
-    id="video-overlay"
-    class:list={['absolute inset-0 z-20 flex flex-col justify-end items-center text-center px-8 pb-14 transition-opacity duration-700', hasVideo && 'opacity-0']}
-    style="background: linear-gradient(transparent 15%, rgba(0,0,0,0.4) 45%, rgba(0,0,0,0.82) 100%)"
+  <!-- Inner div clips the media and overlays — bg-black covers before poster loads.
+       For image-only entrances, clip-path carves a torn-paper bottom edge and
+       filter:drop-shadow casts a shadow that follows the torn contour (not the box). -->
+  <div class="absolute inset-0 bg-black overflow-hidden"
+    style={!hasVideo ? "clip-path: polygon(0% 0%, 100% 0%, 100.000% calc(100% - 34.68px), 99.967% calc(100% - 34.71px), 98.235% calc(100% - 34.85px), 96.515% calc(100% - 35.80px), 94.560% calc(100% - 37.65px), 92.578% calc(100% - 38.44px), 91.237% calc(100% - 39.02px), 89.907% calc(100% - 39.73px), 88.648% calc(100% - 42.16px), 86.623% calc(100% - 48.13px), 84.507% calc(100% - 52.70px), 82.358% calc(100% - 55.74px), 80.188% calc(100% - 58.38px), 78.713% calc(100% - 59.96px), 77.230% calc(100% - 61.34px), 75.695% calc(100% - 63.16px), 74.172% calc(100% - 65.17px), 72.952% calc(100% - 66.05px), 71.780% calc(100% - 64.22px), 70.965% calc(100% - 59.20px), 70.257% calc(100% - 53.49px), 69.488% calc(100% - 48.66px), 68.707% calc(100% - 43.97px), 67.867% calc(100% - 40.88px), 66.885% calc(100% - 42.24px), 65.340% calc(100% - 41.51px), 63.827% calc(100% - 39.23px), 62.413% calc(100% - 37.41px), 61.057% calc(100% - 34.46px), 60.005% calc(100% - 30.78px), 58.975% calc(100% - 26.87px), 58.025% calc(100% - 23.55px), 56.982% calc(100% - 22.25px), 54.737% calc(100% - 22.28px), 52.488% calc(100% - 22.25px), 50.265% calc(100% - 22.76px), 48.045% calc(100% - 23.46px), 46.210% calc(100% - 24.73px), 44.370% calc(100% - 25.95px), 42.548% calc(100% - 27.32px), 40.765% calc(100% - 29.62px), 39.815% calc(100% - 29.73px), 38.572% calc(100% - 29.94px), 37.323% calc(100% - 30.63px), 34.883% calc(100% - 32.16px), 32.427% calc(100% - 33.16px), 29.972% calc(100% - 33.48px), 27.748% calc(100% - 33.43px), 25.525% calc(100% - 33.50px), 24.135% calc(100% - 32.90px), 22.748% calc(100% - 32.15px), 21.528% calc(100% - 32.03px), 20.313% calc(100% - 31.60px), 17.858% calc(100% - 30.87px), 15.450% calc(100% - 28.48px), 12.928% calc(100% - 24.66px), 10.343% calc(100% - 23.50px), 8.155% calc(100% - 23.68px), 5.985% calc(100% - 25.08px), 4.013% calc(100% - 27.17px), 2.032% calc(100% - 28.54px), 0.628% calc(100% - 28.75px), 0.000% calc(100% - 30.89px), 0% 0%);" : undefined}
   >
-    <h1 class="text-white text-4xl md:text-6xl font-bold mb-4 max-w-2xl leading-tight" style="text-shadow: 0 2px 16px rgba(0,0,0,0.55), 0 1px 4px rgba(0,0,0,0.4)">
-      {title}
-    </h1>
-    <p class="text-white/85 text-base max-w-xl leading-relaxed" style="text-shadow: 0 1px 8px rgba(0,0,0,0.5)">{subtitle}</p>
+    <!-- Poster: converted to WebP at build time via Astro Image (1280px, q65).
+         id is preserved so JS focus/freeze logic still works. -->
+    {poster_desktop && (
+      <Image
+        id="video-poster"
+        src={poster_desktop}
+        alt=""
+        aria-hidden="true"
+        loading="eager"
+        fetchpriority="high"
+        width={1280}
+        height={720}
+        quality={65}
+        format="webp"
+        class="absolute inset-0 w-full h-full object-cover"
+        style={`object-position: ${focus_desktop}`}
+      />
+    )}
 
-    <div class="mt-8 flex flex-col items-center gap-1 text-white/50">
-      <span class="text-xs uppercase tracking-widest">scroll to read</span>
-      <svg class="w-5 h-5 animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-      </svg>
+    {hasVideo && (
+      <video
+        id="entrance-video"
+        class="absolute inset-0 w-full h-full object-cover z-10"
+        autoplay
+        muted
+        playsinline
+        {...shouldLoop ? { loop: true } : {}}
+      >
+        {video_desktop && (
+          <source src={video_desktop} media="(min-width: 768px)" type="video/mp4" />
+        )}
+        {video_mobile && (
+          <source src={video_mobile} type="video/mp4" />
+        )}
+      </video>
+    )}
+
+    <!-- Title overlay — fades in at title_appears_at, or immediately if no video -->
+    <div
+      id="video-overlay"
+      class:list={['absolute inset-0 z-20 flex flex-col justify-end items-center text-center px-8 pb-14 transition-opacity duration-700', hasVideo && 'opacity-0']}
+      style="background: linear-gradient(transparent 15%, rgba(0,0,0,0.4) 45%, rgba(0,0,0,0.82) 100%)"
+    >
+      <h1 class="text-white text-4xl md:text-6xl font-bold mb-4 max-w-2xl leading-tight" style="text-shadow: 0 2px 16px rgba(0,0,0,0.55), 0 1px 4px rgba(0,0,0,0.4)">
+        {title}
+      </h1>
+      <p class="text-white/85 text-base max-w-xl leading-relaxed" style="text-shadow: 0 1px 8px rgba(0,0,0,0.5)">{subtitle}</p>
+
+      <div class="mt-8 flex flex-col items-center gap-1 text-white/50">
+        <span class="text-xs uppercase tracking-widest">scroll to read</span>
+        <svg class="w-5 h-5 animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+        </svg>
+      </div>
     </div>
+
+    <!-- Mute toggle — only rendered when a video source is present -->
+    {hasVideo && (
+      <button
+        id="mute-toggle"
+        type="button"
+        class="absolute top-16 right-4 z-30 bg-black/40 hover:bg-black/60 text-white rounded-full p-2 transition-colors"
+        aria-label="Unmute video"
+      >
+        <svg id="icon-muted" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2" />
+        </svg>
+        <svg id="icon-unmuted" class="w-5 h-5 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M15.536 8.464a5 5 0 010 7.072M12 6v12M8.464 9.172a5 5 0 000 5.656M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+        </svg>
+      </button>
+    )}
   </div>
 
-  <!-- Mute toggle — only rendered when a video source is present -->
-  {hasVideo && (
-    <button
-      id="mute-toggle"
-      type="button"
-      class="absolute top-16 right-4 z-30 bg-black/40 hover:bg-black/60 text-white rounded-full p-2 transition-colors"
-      aria-label="Unmute video"
-    >
-      <svg id="icon-muted" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-          d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2" />
-      </svg>
-      <svg id="icon-unmuted" class="w-5 h-5 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-          d="M15.536 8.464a5 5 0 010 7.072M12 6v12M8.464 9.172a5 5 0 000 5.656M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
-      </svg>
-    </button>
-  )}
+
 </div>
 
 <script define:vars={{ focus_desktop, focus_mobile, title_appears_at, freeze_at, hasVideo }}>
@@ -172,14 +186,5 @@ const shouldLoop = freeze_at === undefined;
     });
   }
 
-  // Scroll fade — layer opacity over first 300px of scroll
-  // pointer-events disabled at opacity 0 so the invisible layer doesn't swallow clicks
-  function handleScroll() {
-    if (entrance) {
-      const opacity = Math.max(0, 1 - window.scrollY / 300);
-      entrance.style.opacity = String(opacity);
-      entrance.style.pointerEvents = opacity === 0 ? 'none' : '';
-    }
-  }
-  window.addEventListener('scroll', handleScroll, { passive: true });
+  // No scroll fade — entrance stays visible until scrolled past by the spacer div above it
 </script>

@@ -24,6 +24,7 @@ interface Props {
   canonicalUrl?: string;
   isArticle?: boolean;
   navTheme?: 'light' | 'dark';
+  navOverHero?: boolean;
 }
 
 const {
@@ -33,6 +34,7 @@ const {
   canonicalUrl = Astro.url.href,
   isArticle = false,
   navTheme = 'light',
+  navOverHero = false,
 } = Astro.props;
 
 const pageTitle = `${title} — ${siteConfig.authorFullName}`;
@@ -107,11 +109,11 @@ const pageTitle = `${title} — ${siteConfig.authorFullName}`;
     <link
       rel="preload"
       as="style"
-      href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,600;1,400&family=Rock+Salt&display=swap"
+      href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,400;0,500;1,400&family=DM+Sans:ital,wght@0,400;0,500;0,600;1,400&family=Rock+Salt&display=swap"
       onload="this.onload=null;this.rel='stylesheet'"
     />
     <noscript>
-      <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,600;1,400&family=Rock+Salt&display=swap" />
+      <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,400;0,500;1,400&family=DM+Sans:ital,wght@0,400;0,500;0,600;1,400&family=Rock+Salt&display=swap" />
     </noscript>
 
     <script type="application/ld+json" set:html={JSON.stringify(personSchema)} />
@@ -121,6 +123,9 @@ const pageTitle = `${title} — ${siteConfig.authorFullName}`;
   <style>
     html { font-size: 18px; }
     :global(h2, h3, h4) { font-family: 'Rock Salt', cursive; }
+    :global(body) { min-height: 100dvh; display: flex; flex-direction: column; }
+    :global(body > *:not(footer)) { flex-shrink: 0; }
+    :global(body > footer) { margin-top: auto; }
   </style>
   <body class="text-gray-900 font-sans antialiased overflow-x-hidden" style="background-color: #f8f5f0; background-image: radial-gradient(ellipse at 50% -5%, #e4ddd2 0%, #f8f5f0 60%);">
 
@@ -134,10 +139,25 @@ const pageTitle = `${title} — ${siteConfig.authorFullName}`;
       ></iframe>
     </noscript>
 
-    <Nav theme={navTheme} />
-    <main>
-      <slot />
-    </main>
+    {navOverHero ? (
+      <div class="relative">
+        <div class="absolute top-0 left-0 right-0 z-60 pointer-events-none">
+          <div class="pointer-events-auto">
+            <Nav theme={navTheme} />
+          </div>
+        </div>
+        <main>
+          <slot />
+        </main>
+      </div>
+    ) : (
+      <>
+        <Nav theme={navTheme} />
+        <main>
+          <slot />
+        </main>
+      </>
+    )}
 
     <footer class="border-t border-gray-100">
       <div class="max-w-3xl mx-auto px-4 py-8 text-sm text-gray-600 flex items-center justify-between">

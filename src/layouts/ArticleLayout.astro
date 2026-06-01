@@ -36,7 +36,6 @@ const {
 
 const hasVideo = !!(video_desktop || video_mobile);
 const hasEntrance = hasVideo || !!(poster_desktop || poster_mobile);
-// Note: the 100vh scroll offset is now emitted by VideoEntrance itself as a sibling spacer div.
 const canonicalUrl = Astro.url.href;
 const ogImage = poster_desktop || siteConfig.ogImageDefault;
 
@@ -48,6 +47,8 @@ const ogImage = poster_desktop || siteConfig.ogImageDefault;
   ogImage={ogImage}
   canonicalUrl={canonicalUrl}
   isArticle={true}
+  navTheme={hasEntrance ? 'dark' : 'light'}
+  navOverHero={hasEntrance}
 >
 
   {hasEntrance && (
@@ -69,7 +70,7 @@ const ogImage = poster_desktop || siteConfig.ogImageDefault;
       <slot />
     </article>
 
-    <div class="max-w-3xl mx-auto px-4">
+    <div class="max-w-4xl mx-auto px-4">
       <AuthorBlock
         name={siteConfig.authorFullName}
         headshotUrl={siteConfig.headshotUrl}
@@ -113,14 +114,12 @@ const ogImage = poster_desktop || siteConfig.ogImageDefault;
     }
 
     :global(main.panel-active) {
-      /* -50% matches the 50vw panel — article and panel each own half the screen */
-      transform: translateX(-50%);
+      transform: translateX(-10%);
     }
 
     @media (max-width: 640px) {
       :global(main.panel-active) {
-        /* Panel is 100vw on mobile — shift article fully off-screen */
-        transform: translateX(-100%);
+        transform: translateX(-10%);
       }
     }
 

@@ -5,34 +5,59 @@ interface Props {
   ctaLinkText: string;
   ctaUrl: string;
   stickerUrl?: string;
+  splotchUrl?: string;
 }
 
-const { body, ctaPrefix, ctaLinkText, ctaUrl, stickerUrl } = Astro.props;
+const { body, ctaPrefix, ctaLinkText, ctaUrl, stickerUrl, splotchUrl } = Astro.props;
 ---
 
-<section class="max-w-3xl mx-auto px-6 py-16 border-t border-gray-100">
-  <div class="workblock-inner">
-    {stickerUrl && (
-      <div class="workblock-sticker-wrap" aria-hidden="true">
-        <img src={stickerUrl} alt="" class="workblock-sticker" />
+<div class="workblock-outer">
+  {splotchUrl && (
+    <img src={splotchUrl} alt="" aria-hidden="true" class="workblock-splotch" />
+  )}
+  <section class="max-w-3xl mx-auto px-6 py-16">
+    <div class="workblock-inner">
+      {stickerUrl && (
+        <div class="workblock-sticker-wrap" aria-hidden="true">
+          <img src={stickerUrl} alt="" class="workblock-sticker" />
+        </div>
+      )}
+      <div class="workblock-content">
+        <p class="text-gray-700 leading-relaxed mb-5">{body}</p>
+        <p class="text-gray-700 leading-relaxed">
+          {ctaPrefix}<a
+            href={ctaUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="text-gray-900 font-medium underline underline-offset-2 hover:text-gray-600"
+          >{ctaLinkText}</a>.
+        </p>
       </div>
-    )}
-    <div class="workblock-content">
-      <p class="text-gray-700 leading-relaxed mb-5">{body}</p>
-      <p class="text-gray-700 leading-relaxed">
-        {ctaPrefix}<a
-          href={ctaUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          class="text-gray-900 font-medium underline underline-offset-2 hover:text-gray-600"
-        >{ctaLinkText}</a>.
-      </p>
     </div>
-  </div>
-</section>
+  </section>
+</div>
 
 <style>
+  .workblock-outer {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .workblock-splotch {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    object-position: center;
+    pointer-events: none;
+    opacity: 0.6;
+    z-index: 0;
+  }
+
   .workblock-inner {
+    position: relative;
+    z-index: 1;
     display: flex;
     align-items: center;
     gap: 2.5rem;

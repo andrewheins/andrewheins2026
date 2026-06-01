@@ -27,8 +27,8 @@ const currentPath = Astro.url.pathname;
     <li>
       <a
         href="/writing"
-        class:list={['site-nav-link', { 'is-current': currentPath.startsWith('/writing') }]}
-        aria-current={currentPath.startsWith('/writing') ? 'page' : undefined}
+        class:list={['site-nav-link', { 'is-current': currentPath === '/writing' || currentPath === '/writing/' }]}
+        aria-current={currentPath === '/writing' || currentPath === '/writing/' ? 'page' : undefined}
       >
         Writing
       </a>
@@ -102,8 +102,13 @@ const currentPath = Astro.url.pathname;
   }
 
   .site-nav-name:hover,
-  .site-nav-link:hover {
+  .site-nav-link:not(.is-current):hover {
     opacity: 0.8;
+  }
+
+  .site-nav-link.is-current {
+    cursor: default;
+    pointer-events: none;
   }
 
   .site-nav-link.is-current::before {
