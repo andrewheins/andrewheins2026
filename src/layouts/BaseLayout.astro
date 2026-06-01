@@ -66,23 +66,14 @@ const pageTitle = `${title} — ${siteConfig.authorFullName}`;
     <!-- RSS -->
     <link rel="alternate" type="application/rss+xml" title={`${siteConfig.authorFullName} — Writing`} href="/rss.xml" />
 
-    <!-- CookieYes — async so it doesn't block rendering; consent defaults below
-         are set synchronously before this script executes, preserving PIPEDA compliance -->
-    <script
-      id="cookieyes"
-      type="text/javascript"
-      async
-      src={`https://cdn-cookieyes.com/client_data/${siteConfig.cookieYesScriptId}/script.js`}
-    ></script>
-
-    <!-- Consent defaults must run synchronously before any analytics load.
-         All consent defaults to denied — zero data collected before explicit
-         user consent, satisfying PIPEDA requirements for Canadian audiences. -->
-    <script define:vars={{ ga4MeasurementId: siteConfig.ga4MeasurementId }}>
+    <!-- Analytics + consent — production only.
+         CookieYes and GA4 are never loaded on localhost or staging (*.pages.dev).
+         Consent defaults run everywhere so gtag() calls are safe in all envs. -->
+    <script define:vars={{ ga4MeasurementId: siteConfig.ga4MeasurementId, cookieYesScriptId: siteConfig.cookieYesScriptId, productionHost: new URL(siteConfig.siteBaseUrl).hostname }}>
       window.dataLayer = window.dataLayer || [];
       function gtag() { dataLayer.push(arguments); }
 
-      // Default everything denied — must run before gtag.js loads
+      // Consent defaults run on every environment — must precede any gtag.js load
       gtag('consent', 'default', {
         analytics_storage:              'denied',
         ad_storage:                     'denied',
@@ -90,39 +81,62 @@ const pageTitle = `${title} — ${siteConfig.authorFullName}`;
         ad_personalization:             'denied',
         functionality_storage:          'denied',
         personalization_storage:        'denied',
-        security_storage:               'granted', // always allowed (CSRF etc.)
+        security_storage:               'granted',
         wait_for_update:                500,
       });
 
-      document.addEventListener('cookieyes-consent-update', function (event) {
-        const detail = event.detail || {};
+      // Only load third-party scripts on the real domain
+      var host = window.location.hostname;
+      var isProduction = host === productionHost || host === 'www.' + productionHost;
 
-        if (detail.analytics === 'yes') {
-          // Upgrade consent before the script loads so GA4 captures this page view
+      if (isProduction) {
+        // Inject CookieYes
+        var cy = document.createElement('script');
+        cy.id    = 'cookieyes';
+        cy.async = true;
+        cy.src   = 'https://cdn-cookieyes.com/client_data/' + cookieYesScriptId + '/script.js';
+        document.head.appendChild(cy);
+
+        function loadGA4() {
+          if (document.getElementById('ga4-script')) return;
           gtag('consent', 'update', {
             analytics_storage:       'granted',
             functionality_storage:   'granted',
             personalization_storage: 'granted',
           });
-
-          // Dynamically inject gtag.js — only fires once per session
-          if (!document.getElementById('ga4-script')) {
-            const s = document.createElement('script');
-            s.id    = 'ga4-script';
-            s.async = true;
-            s.src   = `https://www.googletagmanager.com/gtag/js?id=${ga4MeasurementId}`;
-            document.head.appendChild(s);
-
-            // Configure GA4: disable ad signals, respect consent mode
-            gtag('js', new Date());
-            gtag('config', ga4MeasurementId, {
-              allow_google_signals:              false, // no remarketing / audience
-              allow_ad_personalization_signals:  false,
-              restricted_data_processing:        true,  // CCPA / PIPEDA safe mode
-            });
-          }
+          var s   = document.createElement('script');
+          s.id    = 'ga4-script';
+          s.async = true;
+          s.src   = 'https://www.googletagmanager.com/gtag/js?id=' + ga4MeasurementId;
+          document.head.appendChild(s);
+          gtag('js', new Date());
+          gtag('config', ga4MeasurementId, {
+            allow_google_signals:             false,
+            allow_ad_personalization_signals: false,
+            restricted_data_processing:       true,
+            send_page_view:                   false, // we fire it explicitly below
+          });
+          // Explicit page_view so it fires reliably when GA4 loads mid-session
+          // (e.g. new visitor consenting after the page has already rendered)
+          gtag('event', 'page_view', {
+            page_title:    document.title,
+            page_location: window.location.href,
+          });
         }
-      });
+
+        // Fires when the user interacts with the consent banner
+        document.addEventListener('cookieyes-consent-update', function (event) {
+          var detail = event.detail || {};
+          if (detail.analytics === 'yes') loadGA4();
+        });
+
+        // Fallback for returning visitors: CookieYes may have already set the
+        // consent cookie before this listener was attached — check it directly.
+        document.addEventListener('DOMContentLoaded', function () {
+          var match = document.cookie.match(/(?:^|;\s*)cookieyes-analytics=([^;]*)/);
+          if (match && match[1] === 'yes') loadGA4();
+        });
+      }
     </script>
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
