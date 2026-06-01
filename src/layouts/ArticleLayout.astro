@@ -39,6 +39,33 @@ const hasEntrance = hasVideo || !!(poster_desktop || poster_mobile);
 const canonicalUrl = Astro.url.href;
 const ogImage = poster_desktop || siteConfig.ogImageDefault;
 
+const articleSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: title,
+  description: description,
+  url: canonicalUrl,
+  datePublished: date.toISOString(),
+  image: ogImage,
+  author: {
+    '@type': 'Person',
+    name: siteConfig.authorFullName,
+    url: siteConfig.siteBaseUrl,
+    image: siteConfig.headshotUrl,
+    jobTitle: 'President',
+    worksFor: {
+      '@type': 'Organization',
+      name: siteConfig.employerName,
+      url: siteConfig.employerUrl,
+    },
+  },
+  publisher: {
+    '@type': 'Person',
+    name: siteConfig.authorFullName,
+    url: siteConfig.siteBaseUrl,
+  },
+};
+
 ---
 
 <BaseLayout
@@ -50,6 +77,7 @@ const ogImage = poster_desktop || siteConfig.ogImageDefault;
   navTheme={hasEntrance ? 'dark' : 'light'}
   navOverHero={hasEntrance}
 >
+  <script slot="head" type="application/ld+json" set:html={JSON.stringify(articleSchema)} />
 
   {hasEntrance && (
     <VideoEntrance
