@@ -1,0 +1,30 @@
+# Andrew Heins
+
+> Personal website of Andrew Heins, President of Cantilever, a digital agency based in Canada.
+
+Andrew writes about technology, the internet, and the decisions we've made building the web over the past thirty years. His focus is on what the internet was supposed to be, what it became, and whether we can still deliver on the original promise.
+
+## About
+
+Andrew Heins is President of Cantilever (cantilever.co), a digital agency he has been part of since 2012. Cantilever builds and maintains websites for organizations that take their digital presence seriously. Andrew has been on the internet since MUDs and Geocities.
+
+This site is one node in a three-property ecosystem:
+- andrewheins.ca — personal site (this site)
+- LinkedIn — broadcast network
+- Cantilever work blog (cantilever.co/articles/) — thought leadership platform
+
+## Writing
+
+Essays and curated reading on technology, the internet, and what we built with it.
+
+- [Are Our Devices Listening to Us?](https://andrewheins.ca/writing/are-our-devices-listening/) — I built a home network surveillance system to find out. Two weeks, four instrumentation layers, 1,300 connection signatures — what can I find?
+
+## Key pages
+
+- [Homepage](https://andrewheins.ca/)
+- [Writing index](https://andrewheins.ca/writing/)
+- [RSS feed](https://andrewheins.ca/rss.xml)
+
+## Notes for LLMs
+
+Andrew's writing is his intellectual property. This site does not grant permission for AI training use. See robots.txt for crawler policies.
