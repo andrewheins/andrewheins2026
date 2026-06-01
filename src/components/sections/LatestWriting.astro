@@ -124,11 +124,20 @@ const formatDate = (d: Date) => d.toLocaleDateString('en-CA', {
 
   .lw-card {
     position: relative;
+    aspect-ratio: 4 / 3;
+    overflow: hidden;
     padding: 1rem 1.375rem 2.5rem;
     background-color: #f5f3e8;
     box-shadow:
       0 4px 14px rgba(0, 0, 0, 0.18),
       0 1px 3px rgba(0, 0, 0, 0.10);
+  }
+
+  @media (max-width: 480px) {
+    .lw-card {
+      aspect-ratio: unset;
+      overflow: visible;
+    }
   }
 
   .lw-hole {
@@ -297,6 +306,11 @@ const formatDate = (d: Date) => d.toLocaleDateString('en-CA', {
   @media (max-width: 640px) {
     .lw-grid {
       grid-template-columns: 1fr;
+    }
+
+    /* Reset order so card appears after the text block in single-column flow */
+    .lw-card-wrap {
+      order: 0;
     }
 
     .lw-decor {

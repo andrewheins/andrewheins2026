@@ -40,7 +40,7 @@ const { body, ctaPrefix, ctaLinkText, ctaUrl, stickerUrl, splotchUrl } = Astro.p
 <style>
   .workblock-outer {
     position: relative;
-    overflow: hidden;
+    overflow-x: clip;
   }
 
   .workblock-splotch {
@@ -81,9 +81,14 @@ const { body, ctaPrefix, ctaLinkText, ctaUrl, stickerUrl, splotchUrl } = Astro.p
     min-width: 0;
   }
 
-  @media (max-width: 480px) {
+  @media (max-width: 640px) {
     .workblock-sticker-wrap {
-      width: 5rem;
+      position: absolute;
+      top: calc(-1rem - 5.6rem);
+      left: calc(-1rem - 3.5rem);
+      width: 7rem;
+      z-index: 0;
+      opacity: 0.5;
     }
   }
 </style>
