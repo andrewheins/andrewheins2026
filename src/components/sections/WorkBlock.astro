@@ -1,4 +1,6 @@
 ---
+import { Image, getImage } from 'astro:assets';
+
 interface Props {
   body: string;
   ctaPrefix: string;
@@ -9,17 +11,25 @@ interface Props {
 }
 
 const { body, ctaPrefix, ctaLinkText, ctaUrl, stickerUrl, splotchUrl } = Astro.props;
+
+const optimizedSplotch = splotchUrl ? await getImage({
+  src: splotchUrl,
+  format: 'webp',
+  quality: 75,
+  width: 900,
+  height: 412,
+}) : null;
 ---
 
 <div class="workblock-outer">
   {splotchUrl && (
-    <img src={splotchUrl} alt="" aria-hidden="true" class="workblock-splotch" />
+    <img src={optimizedSplotch!.src} alt="" aria-hidden="true" class="workblock-splotch" loading="lazy" />
   )}
   <section class="max-w-3xl mx-auto px-6 py-16">
     <div class="workblock-inner">
       {stickerUrl && (
         <div class="workblock-sticker-wrap" aria-hidden="true">
-          <img src={stickerUrl} alt="" class="workblock-sticker" />
+          <Image src={stickerUrl} alt="" class="workblock-sticker" width={252} height={252} format="webp" quality={80} loading="lazy" />
         </div>
       )}
       <div class="workblock-content">

@@ -1,4 +1,6 @@
 ---
+import { Image } from 'astro:assets';
+
 interface Props {
   title?: string;
   body: string;
@@ -28,10 +30,10 @@ const tornClipPath = "polygon(" +
     <!-- Inner div gets the clip-path; filter on a parent sees the clipped shape -->
     <div class="intro-outer" style={`clip-path: ${tornClipPath};`}>
       {decorLeft && (
-        <img src={decorLeft} alt="" aria-hidden="true" class="intro-decor intro-decor-left" />
+        <Image src={decorLeft} alt="" aria-hidden="true" class="intro-decor intro-decor-left" loading="lazy" inferSize format="webp" quality={80} />
       )}
       {decorRight && (
-        <img src={decorRight} alt="" aria-hidden="true" class="intro-decor intro-decor-right" />
+        <Image src={decorRight} alt="" aria-hidden="true" class="intro-decor intro-decor-right" loading="lazy" inferSize format="webp" quality={80} />
       )}
       <section class="intro-section">
         <div class="intro-text">
@@ -45,7 +47,7 @@ const tornClipPath = "polygon(" +
   {photo && (
     <div class="intro-photo-outer">
       <div class="intro-photo-wrap">
-        <img src={photo} alt={photoAlt} class="intro-photo-img" />
+        <Image src={photo} alt={photoAlt} class="intro-photo-img" width={800} height={800} format="webp" quality={80} fetchpriority="high" loading="eager" />
         <span class="intro-photo-caption">1990</span>
       </div>
     </div>
