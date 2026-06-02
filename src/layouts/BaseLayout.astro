@@ -25,7 +25,6 @@ interface Props {
   isArticle?: boolean;
   navTheme?: 'light' | 'dark';
   navOverHero?: boolean;
-  overrideTitle?: string; // use when the default "title — Author Name" pattern is wrong
 }
 
 const {
@@ -36,10 +35,13 @@ const {
   isArticle = false,
   navTheme = 'light',
   navOverHero = false,
-  overrideTitle,
 } = Astro.props;
 
-const pageTitle = overrideTitle ?? `${title} — ${siteConfig.authorFullName}`;
+// Homepage: "Andrew Heins — President, Cantilever"
+// All other pages: "Page Title — Andrew Heins"
+const pageTitle = title === siteConfig.authorFullName
+  ? `${siteConfig.authorFullName} — ${siteConfig.professionalHeadline}`
+  : `${title} — ${siteConfig.authorFullName}`;
 ---
 
 <!doctype html>
