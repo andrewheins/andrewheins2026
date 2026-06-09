@@ -1,0 +1,43 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { siteConfig } from '../site.config';
+
+const canonicalUrl = Astro.url.href;
+---
+
+<BaseLayout title="404" description="This page doesn't exist." canonicalUrl={canonicalUrl}>
+  <div class="min-h-screen flex items-center justify-center px-4">
+    <div class="postit">
+      <h1 class="text-3xl font-bold mb-8">404</h1>
+      <p class="text-base mb-3">Not sure what you were looking for, but you won't find it here.</p>
+      <p class="text-base"><a href="/" class="underline underline-offset-2 hover:opacity-70 transition-opacity">Back to the homepage.</a></p>
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .postit h1 {
+    font-family: 'Rock Salt', cursive;
+  }
+
+  .postit {
+    background: #fef08a;
+    color: #1c1917;
+    padding: 2.5rem 2.75rem 2.75rem;
+    max-width: 22rem;
+    width: 100%;
+    box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.18), 6px 6px 24px rgba(0, 0, 0, 0.10);
+    transform: rotate(-1.5deg);
+    position: relative;
+  }
+
+  .postit::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 6px;
+    background: rgba(0, 0, 0, 0.08);
+  }
+</style>
