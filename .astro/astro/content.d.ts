@@ -159,6 +159,27 @@ declare module 'astro:content' {
   collection: "writing";
   data: InferEntrySchema<"writing">
 } & { render(): Render[".mdx"] };
+"offline-marketing-website-traffic.mdx": {
+	id: "offline-marketing-website-traffic.mdx";
+  slug: "offline-marketing-website-traffic";
+  body: string;
+  collection: "writing";
+  data: InferEntrySchema<"writing">
+} & { render(): Render[".mdx"] };
+"unglamorous-client-engagement-qualities.mdx": {
+	id: "unglamorous-client-engagement-qualities.mdx";
+  slug: "unglamorous-client-engagement-qualities";
+  body: string;
+  collection: "writing";
+  data: InferEntrySchema<"writing">
+} & { render(): Render[".mdx"] };
+"wordpress-conflict-risks-alternatives.mdx": {
+	id: "wordpress-conflict-risks-alternatives.mdx";
+  slug: "wordpress-conflict-risks-alternatives";
+  body: string;
+  collection: "writing";
+  data: InferEntrySchema<"writing">
+} & { render(): Render[".mdx"] };
 };
 
 	};
