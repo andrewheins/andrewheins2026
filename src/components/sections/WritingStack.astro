@@ -143,9 +143,14 @@ const rotations = [-1.1, 0.7, -0.4, 1.0, -0.8, 0.5, -1.2, 0.6, -0.3, 0.9];
 
   .ws-card:not(.ws-card--solo):hover,
   .ws-card:not(.ws-card--solo):focus-within {
-    transform: rotate(var(--tilt)) translateY(-2rem);
+    transform: rotate(var(--tilt)) translateY(calc(-1 * var(--lift, 2.4rem)));
     transition: transform 0.2s ease;
     z-index: 50;
+  }
+
+  .ws-card:not(.ws-card--solo):hover .ws-card-inner,
+  .ws-card:not(.ws-card--solo):focus-within .ws-card-inner {
+    overflow: visible;
   }
 
   @media (max-width: 640px) {
@@ -259,3 +264,40 @@ const rotations = [-1.1, 0.7, -0.4, 1.0, -0.8, 0.5, -1.2, 0.6, -0.3, 0.9];
     }
   }
 </style>
+
+<script>
+  function measureLift() {
+    const basePx = parseFloat(getComputedStyle(document.documentElement).fontSize);
+    const overlapPx = 11 * basePx; // matches margin-bottom: -11rem
+
+    document.querySelectorAll('.ws-card:not(.ws-card--solo)').forEach(card => {
+      const inner = card.querySelector('.ws-card-inner');
+      if (!inner) return;
+
+      const restingH = inner.offsetHeight;
+
+      // Temporarily remove constraints to measure natural content height
+      const prev = { aspectRatio: inner.style.aspectRatio, height: inner.style.height, overflow: inner.style.overflow };
+      inner.style.aspectRatio = 'unset';
+      inner.style.height = 'auto';
+      inner.style.overflow = 'visible';
+      const naturalH = inner.scrollHeight;
+      inner.style.aspectRatio = prev.aspectRatio;
+      inner.style.height = prev.height;
+      inner.style.overflow = prev.overflow;
+
+      // Lift enough to bring all content above the next stacked card
+      const visibleAtRest = restingH - overlapPx;
+      const lift = Math.max(0, naturalH - visibleAtRest);
+      card.style.setProperty('--lift', lift + 'px');
+    });
+  }
+
+  measureLift();
+
+  let resizeTimer: ReturnType<typeof setTimeout>;
+  window.addEventListener('resize', () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(measureLift, 150);
+  });
+</script>
